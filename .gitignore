@@ -12,3 +12,6 @@ __pycache__/
 *.pyc
 db.sqlite3
 db.sqlite3-journal
+
+# node
+node_modules
