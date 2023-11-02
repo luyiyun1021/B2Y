@@ -1,5 +1,5 @@
 import "../styles/App.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { FloatButton, QRCode, Button } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -14,12 +14,45 @@ export function Login() {
   const [Bprompt, setBprompt] = useState("Scan the QR code on the mobile app");
   const [QR, setQR] = useState("https://bilibili.com");
 
-  if (Blogin) {
-    // fetch().then()
-    setInterval(() => {
-      // fetch().then()
-    }, 1000);
-  }
+  useEffect(() => {
+    if (Blogin) {
+      // fetch(
+      //   "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
+      // )
+      //   .then(
+      //     (res) => {
+      //       let data = res.json().data;
+      //       let url = data.url;
+      //       let key = data.qrcode_key;
+      //       setQR(url);
+      //       while (true) {
+      //         fetch(
+      //           `https://passport.bilibili.com/x/passport-login/web/qrcode/poll?${key}`,
+      //           { method: "get", mode: "cors" }
+      //         ).then((res) => {
+      //           let data = res.json().data;
+      //           if (data.code === 0) {
+      //             console.log(document.cookie);
+      //           }
+      //         });
+      //       }
+      //     },
+      //     {
+      //       method: "get",
+      //       mode: "cors",
+      //       credentials: "include",
+      //       referer: "https://passport.bilibili.com/login",
+      //       headers: {
+      //         Accept: "*/*",
+      //       },
+      //     }
+      //   )
+      //   .catch((error) => console.log(error));
+      // // setInterval(() => {
+      // //   // fetch().then()
+      // // }, 1000);
+    }
+  }, [Blogin]);
 
   const bilibiliLogout = () => {
     setBsignined(false);
