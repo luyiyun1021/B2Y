@@ -16,14 +16,22 @@ let data = {
       title: "hello",
       desc: "!",
       img: "images/youtube.png",
+      like: 50,
+      star: 100,
+      comment: 150,
       disable: false,
+      checked: false,
     },
     {
       id: 2,
       title: "world",
       desc: "?",
       img: "images/youtube.png",
+      like: 50,
+      star: 100,
+      comment: 150,
       disable: false,
+      checked: false,
     },
   ],
   sets: [
@@ -43,12 +51,25 @@ export function B2YUploader() {
     });
 
   if (
-    // localStorage.getItem("user_id") == null ||
-    // localStorage.getItem("access_token") == null
-    false
+    sessionStorage.getItem("SESSDATA") == null ||
+    sessionStorage.getItem("access_token") == null
+    // false
   ) {
     return <Navigate replace to="/login" />;
   } else {
+    fetch(
+      `http://localhost:8000/B2Y/uploader?SESSDATA=${sessionStorage.getItem(
+        "SESSDATA"
+      )}&access_token=${sessionStorage.getItem("access_token")}`,
+      { method: "get" }
+    )
+      .then(async (res) => {
+        let json = await res.json();
+        console.log(json);
+      })
+      .catch((err) => {
+        alert("Something wrong, please try to re-login.");
+      });
     return (
       <div style={{ margin: "2rem" }}>
         <Button

@@ -8,62 +8,68 @@ export function Login() {
   const [Blogin, setBlogin] = useState(false);
   const [Ylogin, setYlogin] = useState(false);
 
-  const [Bsignined, setBsignined] = useState(false);
-  const [Ysignined, setYsignined] = useState(false);
+  const [Bsignined, setBsignined] = useState(
+    sessionStorage.getItem("SESSDATA") !== null
+  );
+  const [Ysignined, setYsignined] = useState(
+    sessionStorage.getItem("access_token") !== null
+  );
 
   const [Bprompt, setBprompt] = useState("Scan the QR code on the mobile app");
   const [QR, setQR] = useState("https://bilibili.com");
 
+  const [poll, setPoll] = useState(0);
+
   useEffect(() => {
-    if (Blogin) {
-      // fetch(
-      //   "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
-      // )
-      //   .then(
-      //     (res) => {
-      //       let data = res.json().data;
-      //       let url = data.url;
-      //       let key = data.qrcode_key;
-      //       setQR(url);
-      //       while (true) {
-      //         fetch(
-      //           `https://passport.bilibili.com/x/passport-login/web/qrcode/poll?${key}`,
-      //           { method: "get", mode: "cors" }
-      //         ).then((res) => {
-      //           let data = res.json().data;
-      //           if (data.code === 0) {
-      //             console.log(document.cookie);
-      //           }
-      //         });
-      //       }
-      //     },
-      //     {
-      //       method: "get",
-      //       mode: "cors",
-      //       credentials: "include",
-      //       referer: "https://passport.bilibili.com/login",
-      //       headers: {
-      //         Accept: "*/*",
-      //       },
-      //     }
-      //   )
-      //   .catch((error) => console.log(error));
-      // // setInterval(() => {
-      // //   // fetch().then()
-      // // }, 1000);
+    if (Blogin && !Bsignined) {
+      fetch("http://localhost:8000/bilibili/qrcode", {
+        method: "get",
+        credentials: "include",
+      }).then(async (res) => {
+        let data = await res.json();
+        data = data.data;
+        let url = data.url;
+        let key = data.qrcode_key;
+        setQR(url);
+        console.log(url);
+        setPoll(
+          setInterval(() => {
+            if (!Bsignined) {
+              fetch(
+                `http://localhost:8000/bilibili/qrcode/poll?qrcode_key=${key}`,
+                {
+                  method: "get",
+                  credentials: "include",
+                }
+              ).then(async (response) => {
+                let data = await response.json();
+                data = data.data;
+                if (data.code === 0) {
+                  setBsignined(true);
+                  sessionStorage.setItem("SESSDATA", data.SESSDATA);
+                  return;
+                }
+              });
+            }
+          }, 1000)
+        );
+      });
     }
-  }, [Blogin]);
+  }, [Blogin, Bsignined]);
+
+  useEffect(() => {
+    if (!Blogin || Bsignined) clearInterval(poll);
+  }, [Bsignined, Blogin]);
 
   const bilibiliLogout = () => {
     setBsignined(false);
     setBprompt("Scan the QR code on the mobile app");
-    localStorage.removeItem("user_id");
+    sessionStorage.removeItem("SESSDATA");
   };
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      console.log(tokenResponse.access_token);
-      localStorage.setItem("access_token", tokenResponse.access_token);
+      sessionStorage.setItem("access_token", tokenResponse.access_token);
       setYsignined(true);
     },
     onError: (errorMsg) => {
@@ -75,7 +81,7 @@ export function Login() {
 
   const googleLogout = () => {
     setYsignined(false);
-    localStorage.removeItem("access_token");
+    sessionStorage.removeItem("access_token");
   };
 
   return (
@@ -175,7 +181,11 @@ export function Login() {
       ) : (
         <h3>Please login both account first</h3>
       )}
-      <Button disabled={Bsignined && Ysignined ? false : true} size="large">
+      <Button
+        disabled={Bsignined && Ysignined ? false : true}
+        size="large"
+        onClick={() => (window.location.href = "/B2YUploader")}
+      >
         Transfer as uploader
       </Button>
       <Button disabled={Bsignined && Ysignined ? false : true} size="large">
