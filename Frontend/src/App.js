@@ -9,7 +9,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/main" element={<B2YUploader />} />
+        <Route path="/B2YUploader" element={<B2YUploader />} />
         <Route path="/login" element={<Login />} />
         <Route path="/*" element={<Navigate replace to="/login" />} />
       </Routes>

@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpRequest, JsonResponse
 from pyyoutube import Client
 import bili2youtube.youtube_utils as youtube_utils
 from bili2youtube.models import UserIDMapping, VideoIDMapping
+import requests
 
 
 def migrate_uploader(request: HttpRequest) -> HttpResponse:
@@ -124,6 +125,75 @@ def migrate_viewer(request: HttpRequest) -> HttpResponse:
                 yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
                 youtube_utils.rate_video(youtube_client, yvid, rating)
 
+        return JsonResponse({"status": "success", "data": "Hello, world!"})
+    except Exception as e:
+        # traceback.print_exc(e)
+        response = {}
+        response["result"] = "error_bad_datasource"
+        response["data"] = e.__str__()
+        print(e.__str__())
+        return JsonResponse(response)
+
+def get_Bilibili_QRcode(request: HttpRequest) -> HttpResponse:
+    try:
+        return JsonResponse(requests.get("https://passport.bilibili.com/x/passport-login/web/qrcode/generate").json(), safe=False)
+    except Exception as e:
+        # traceback.print_exc(e)
+        response = {}
+        response["result"] = "error_bad_datasource"
+        response["data"] = e.__str__()
+        print(e.__str__())
+        return JsonResponse(response)
+
+def check_Bilibili_QRcode(request: HttpRequest) -> HttpResponse:
+    try:
+        data = requests.get(f'https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key={request.GET.get("qrcode_key")}')
+        json = data.json()
+        json["data"]["SESSDATA"] = data.cookies.get_dict()["SESSDATA"]
+        return JsonResponse(json, safe=False)
+    except Exception as e:
+        # traceback.print_exc(e)
+        response = {}
+        response["result"] = "error_bad_datasource"
+        response["data"] = e.__str__()
+        print(e.__str__())
+        return JsonResponse(response)
+
+def B2Y_get_uploader_info(request: HttpRequest) -> HttpResponse:
+    try:
+        SESSDATA = request.GET.get("SESSDATA")
+        access_token = request.GET.get("access_token")
+        # TODO
+        # data = {
+        #   videos: [
+        #     {
+        #       id: 1,
+        #       title: "hello",
+        #       desc: "!",
+        #       img: "images/youtube.png",
+        #       like: 50,
+        #       star: 100,
+        #       comment: 150,
+        #       disable: false,
+        #       checked: false,
+        #     },
+        #     {
+        #       id: 2,
+        #       title: "world",
+        #       desc: "?",
+        #       img: "images/youtube.png",
+        #       like: 50,
+        #       star: 100,
+        #       comment: 150,
+        #       disable: false,
+        #       checked: false,
+        #     },
+        #   ],
+        #   sets: [ (Can change to be detailed if you want)
+        #     { id: 1, title: "set1", videoidx: [0] },
+        #     { id: 2, title: "set2", videoidx: [1] },
+        #   ],
+        # };
         return JsonResponse({"status": "success", "data": "Hello, world!"})
     except Exception as e:
         # traceback.print_exc(e)
