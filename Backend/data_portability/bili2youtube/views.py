@@ -3,8 +3,17 @@ from pyyoutube import Client
 import bili2youtube.youtube_utils as youtube_utils
 from bili2youtube.models import UserIDMapping, VideoIDMapping
 import requests
-
-
+import bili2youtube.bilibili_utils.uploader as bili_utils_u
+def migrate_helloworld(request: HttpRequest) -> HttpResponse:
+    # mid = "1794123514"
+    # all_videos = bili_utils_u.get_all_videos_with_detailed_info(mid)
+    # all_series_with_video_ids = bili_utils_u.get_all_series_list_with_video_ids(mid)
+    # data = {
+    #     'videos': all_videos,
+    #     'sets': all_series_with_video_ids,
+    # }
+    # return JsonResponse({"status": "success", "data": data})
+    return HttpResponse("hello world!")
 def migrate_uploader(request: HttpRequest) -> HttpResponse:
     try:
         ### TODO: Get Bilibili UID
@@ -163,38 +172,15 @@ def B2Y_get_uploader_info(request: HttpRequest) -> HttpResponse:
     try:
         SESSDATA = request.GET.get("SESSDATA")
         access_token = request.GET.get("access_token")
-        # TODO
-        # data = {
-        #   videos: [
-        #     {
-        #       id: 1,
-        #       title: "hello",
-        #       desc: "!",
-        #       img: "images/youtube.png",
-        #       like: 50,
-        #       star: 100,
-        #       comment: 150,
-        #       disable: false,
-        #       checked: false,
-        #     },
-        #     {
-        #       id: 2,
-        #       title: "world",
-        #       desc: "?",
-        #       img: "images/youtube.png",
-        #       like: 50,
-        #       star: 100,
-        #       comment: 150,
-        #       disable: false,
-        #       checked: false,
-        #     },
-        #   ],
-        #   sets: [ (Can change to be detailed if you want)
-        #     { id: 1, title: "set1", videoidx: [0] },
-        #     { id: 2, title: "set2", videoidx: [1] },
-        #   ],
-        # };
-        return JsonResponse({"status": "success", "data": "Hello, world!"})
+        user = bili_utils_u.get_user_info(SESSDATA)
+        mid = user['mid']
+        all_videos = bili_utils_u.get_all_videos_with_detailed_info(mid)
+        all_series_with_video_ids = bili_utils_u.get_all_series_list_with_video_ids(mid)
+        data = {
+            'videos': all_videos,
+            'sets': all_series_with_video_ids,
+        }
+        return JsonResponse({"status": "success", "data": data})
     except Exception as e:
         # traceback.print_exc(e)
         response = {}
