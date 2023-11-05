@@ -1,6 +1,5 @@
 import requests
 import math
-
 from Backend.data_portability.bili2youtube.youtube_utils import *
 
 
@@ -117,13 +116,15 @@ def create_youtube_playlist_for_viewer(mid, session_id=SESSION_ID):
         youtube_playlists = []
         folder_list = get_collection_folders(mid)
         for folder in folder_list:
-            collection_videos = get_collection_videos_from_a_folder(folder['id'], session_id=session_id)  # session_id
+            folder_id = folder['id']
+            folder_description = get_collection_folder_intro_description(folder_id, session_id=session_id)
+            collection_videos = get_collection_videos_from_a_folder(folder_id, session_id=session_id)
             videos = []
             for video in collection_videos:
                 videos.append(video['bvid'])
             playlist = PlaylistInfo(
                 title=folder['title'],
-                description=get_collection_folder_intro_description(folder['id'], session_id=session_id),  # session_id
+                description=folder_description,
                 tags=[],
                 defaultLanguage="en",
                 privacyStatus="private",

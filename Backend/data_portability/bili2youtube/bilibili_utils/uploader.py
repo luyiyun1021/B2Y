@@ -3,11 +3,11 @@ import math
 import subprocess
 import time
 from fake_useragent import UserAgent
+from Backend.data_portability.bili2youtube.youtube_utils import *
 
 SESSION_ID = ''
 VIDEO_DOWNLOAD_PATH = "/Users/ziranmin/Downloads/"
-VIDEO_DOWNLOAD_QUALITY_ID = 32
-
+VIDEO_DOWNLOAD_QUALITY_ID = 32 # 清晰度参考 https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
 
 def get_user_info(session_id=SESSION_ID):
     url = 'https://api.bilibili.com/x/web-interface/nav'
@@ -148,7 +148,8 @@ def get_series_lists(mid):
             series_list = json_response['data']['items_lists']['series_list']
             for item in series_list:
                 res.append({'series_id': item['meta']['series_id'],
-                            'name': item['meta']['name']})
+                            'name': item['meta']['name'],
+                            'description': item['meta']['description']})
         return res
 
     except Exception as error:
@@ -320,32 +321,66 @@ def get_all_series_list_with_video_ids(mid):
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
 
+def create_youtube_playlist_for_uploader(mid):
+    try:
+        bplaylists = []
+        series_lists = get_series_lists(mid)
+        for series in series_lists:
+            series_id = series['series_id']
+            videos = get_series_list_videos(mid, series_id)
+            youtube_video_list = []
+            for video in videos:
+                youtube_video_list.append(video['bvid'])
+            playlist = PlaylistInfo(
+                    title=series['name'],
+                    description=series['description'],
+                    tags=[],
+                    defaultLanguage="en",
+                    privacyStatus="private",
+                    platform=Platform.BILIBILI,
+                    videoList=youtube_video_list,
+                )
+            bplaylists.append(playlist)
+        return bplaylists
+    except Exception as error:
+        print("An exception occurred:", type(error).__name__, "–", error)
+
+def get_and_download_all_videos_from_bilibili_for_youtube(mid, session_id=SESSION_ID, qn=VIDEO_DOWNLOAD_QUALITY_ID, path=VIDEO_DOWNLOAD_PATH):
+    try:
+        bvideos = []
+        all_video_list = get_all_videos(mid)
+        for video in all_video_list:
+            bvid = video['bvid']
+            video_info = get_video_info(bvid)
+            video_tags = get_video_tags(bvid, session_id)
+            cid = video_info['cid']
+
+            vurl = get_video_source_link(bvid, cid)
+            download_video(bvid, vurl, qn, path)
+
+            youtube_video = VideoInfo(
+                filename=VIDEO_DOWNLOAD_PATH + bvid + '_' + str(VIDEO_DOWNLOAD_QUALITY_ID) + '_test_' + '.mp4',
+                title=video_info['title'],
+                platform=Platform.BILIBILI,
+                id=bvid,
+                description=video_info['desc'],
+                tags=video_tags,
+                privacyStatus="private",
+            )
+            bvideos.append(youtube_video)
+        return bvideos
+    except Exception as error:
+        print("An exception occurred:", type(error).__name__, "–", error)
+
 
 if __name__ == '__main__':
     print("hello world")
 
+    mid = '1794123514'
 
-    # # get all the videos uploaded by a user ordered by latest created time
-    # print("get all the videos uploaded by Meetfood觅食 ordered by latest created time")
-    # mid = '1794123514' # Meetfood觅食 user id
-    #
-    # for i in range(1):
-    #     print(i)
-    #     all_video_id_list = get_all_videos(mid)
-    #     print(len(all_video_id_list))
-    #     for v in all_video_id_list:
-    #         print(v)
+    print(create_youtube_playlist_for_uploader(mid))
 
-    # agent_set = set()
-    # ua = UserAgent()
-    # for i in range(100):
-    #     ag = ua.random
-    #     while ag in agent_set:
-    #         ag = ua.random
-    #     print(ag)
-    #     agent_set.add(ag)
-    #
-
+    print(get_and_download_all_videos_from_bilibili_for_youtube(mid))
 
 
     # # print out own account info by using the session id got from QR code login

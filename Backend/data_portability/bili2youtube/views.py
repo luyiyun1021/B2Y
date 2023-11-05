@@ -5,21 +5,16 @@ from bili2youtube.models import UserIDMapping, VideoIDMapping
 import requests
 import bili2youtube.bilibili_utils.uploader as bili_utils_u
 import bili2youtube.bilibili_utils.viewer as bili_utils_v
-def migrate_helloworld(request: HttpRequest) -> HttpResponse:
-    mid = "1794123514"
-    all_videos = bili_utils_u.get_all_videos_with_detailed_info(mid)
-    all_series_with_video_ids = bili_utils_u.get_all_series_list_with_video_ids(mid)
-    data = {
-        'videos': all_videos,
-        'sets': all_series_with_video_ids,
-    }
-    return JsonResponse({"status": "success", "data": data})
-    # return HttpResponse("hello world!")
-    # return JsonResponse({"status": "success", "data": "hello world!"})
+
+VIDEO_DOWNLOAD_PATH = "/Users/ziranmin/Downloads/"
+VIDEO_DOWNLOAD_QUALITY_ID = 32 # 清晰度参考 https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
+
 def migrate_uploader(request: HttpRequest) -> HttpResponse:
     try:
-        ### TODO: Get Bilibili UID
-        buid = ""
+        b_session_data = request.GET.get("SESSDATA")
+        user = bili_utils_u.get_user_info(b_session_data)
+        # Get Bilibili UID
+        buid = user['mid']
 
         ### Initialize YouTube client
         youtube_access_token = request.GET.get("youtube_access_token")
@@ -39,19 +34,8 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
                 {"status": "success", "data": "Already migrated this user!"}
             )
 
-        ### TODO: Download Bilibili videos
-        ### sample videos
-        bvideos = [
-            youtube_utils.VideoInfo(
-                filename="",
-                title="",
-                platform=youtube_utils.Platform.BILIBILI,
-                id="bvid00000",
-                description="",
-                tags=[],
-                privacyStatus="private",
-            )
-        ]
+        # Download Bilibili videos
+        bvideos = bili_utils_u.get_and_download_all_videos_from_bilibili_for_youtube(buid, session_id=b_session_data, qn=VIDEO_DOWNLOAD_QUALITY_ID, path=VIDEO_DOWNLOAD_PATH)
 
         ### Upload Bilibili videos to YouTube, use multi-processing to speed up
         yvideo_ids = youtube_utils.upload_videos(youtube_client, bvideos)
@@ -64,19 +48,8 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
             ):
                 VideoIDMapping.objects.create(bvid=bvideo.id, yvid=yvideo_id)
 
-        ### TODO: Get Bilbili playlists
-        ### sample playlists
-        bplaylists = [
-            youtube_utils.PlaylistInfo(
-                title="",
-                description="",
-                tags=[],
-                defaultLanguage="en",
-                privacyStatus="private",
-                platform=youtube_utils.Platform.BILIBILI,
-                videoList=["bvid00000"],
-            )
-        ]
+        # Get Bilbili playlists
+        bplaylists = bili_utils_u.create_youtube_playlist_for_uploader(buid)
 
         ### Migrate uploader's playlists
         for bplaylist in bplaylists:
