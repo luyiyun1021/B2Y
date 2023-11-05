@@ -1,6 +1,9 @@
 import requests
 import math
 
+from Backend.data_portability.bili2youtube.youtube_utils import *
+
+
 SESSION_ID = ''
 
 def get_followings_list(mid, page_size=10, session_id=SESSION_ID):
@@ -57,6 +60,24 @@ def get_collection_folders(mid):
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
 
+def get_collection_folder_intro_description(folder_id, session_id=SESSION_ID):
+    url = 'https://api.bilibili.com/x/v3/fav/resource/list'
+    cookies = {'SESSDATA': session_id}
+    params = {
+        'media_id': folder_id,
+        'ps': 10,
+        'pn': 1,
+        'platform': 'web',
+    }
+    try:
+        response = requests.get(url, params=params, cookies=cookies)
+        json_response = response.json()
+        info_data = json_response['data']['info']
+        description = info_data['intro']
+        return description
+    except Exception as error:
+        print("An exception occurred:", type(error).__name__, "–", error)
+
 def get_collection_videos_from_a_folder(folder_id, page_size=2, session_id=SESSION_ID):
     url = 'https://api.bilibili.com/x/v3/fav/resource/list'
     cookies = {'SESSDATA': session_id}
@@ -91,6 +112,29 @@ def get_collection_videos_from_a_folder(folder_id, page_size=2, session_id=SESSI
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
 
+def create_youtube_playlist_for_viewer(mid, session_id=SESSION_ID):
+    try:
+        youtube_playlists = []
+        folder_list = get_collection_folders(mid)
+        for folder in folder_list:
+            collection_videos = get_collection_videos_from_a_folder(folder['id'], session_id=session_id)  # session_id
+            videos = []
+            for video in collection_videos:
+                videos.append(video['bvid'])
+            playlist = PlaylistInfo(
+                title=folder['title'],
+                description=get_collection_folder_intro_description(folder['id'], session_id=session_id),  # session_id
+                tags=[],
+                defaultLanguage="en",
+                privacyStatus="private",
+                platform=Platform.BILIBILI,
+                videoList=videos,
+            )
+            youtube_playlists.append(playlist)
+        return youtube_playlists
+    except Exception as error:
+        print("An exception occurred:", type(error).__name__, "–", error)
+
 
 # NOTE: current limitation:
 # 1. can only get most recent 20 likes, couldn't find correct pagination method;
@@ -121,7 +165,37 @@ if __name__ == '__main__':
 
     mid = 1794123514 # Ziran's user id
 
-    # # get a list of accounts that the given user is following
+
+    print(create_youtube_playlist_for_viewer(mid))
+
+
+
+
+
+
+
+    # v1 = VideoInfo(
+    #     filename="xxx",
+    #     title="zzz",
+    #     platform=Platform.BILIBILI,
+    #     id="bvid00000",
+    #     description="",
+    #     tags=[],
+    #     privacyStatus="private",
+    # )
+    # print(v1)
+
+
+
+
+
+
+
+
+
+
+
+    # get a list of accounts that the given user is following
     # print("get a list of accounts that the given user is following")
     # following_list = get_followings_list(1794123514)
     # for x in following_list:

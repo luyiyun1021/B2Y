@@ -73,13 +73,16 @@ class VideoInfo:
         self.platform = platform
         self.id = id
 
+    def __repr__(self):
+        d = "{" + "\n" + f" 'filename': {self.filename}," +"\n" + f" 'title': {self.title},"  +"\n" + f" 'platform': {self.platform}," +"\n" + f" 'id': {self.id}," +"\n" + f" 'description': {self.description}," +"\n"+ f" 'tags': {self.tags}," +"\n" + f" 'privacyStatus': {self.privacyStatus}," +"\n"+ "}"
+        return d
 
 class PlaylistInfo:
     def __init__(
         self,
         title: str,
         description: str = "",
-        tags: list[str] = [],
+        tags: list[str] = [],  #B站没有
         defaultLanguage="en",
         privacyStatus: str = "private",
         platform: Platform = Platform.DEFAULT,
@@ -92,7 +95,9 @@ class PlaylistInfo:
         self.privacyStatus = privacyStatus
         self.platform = platform
         self.videoList = videoList
-
+    def __repr__(self):
+        d = "{" + "\n" + f" 'title': {self.title}," +"\n" + f" 'description': {self.description},"  +"\n" + f" 'tags': {self.tags}," +"\n" + f" 'defaultLanguage': {self.defaultLanguage}," +"\n" + f" 'privacyStatus': {self.privacyStatus}," +"\n"+ f" 'platform': {self.platform}," +"\n" + f" 'videoList': {self.videoList}," +"\n"+ "}"
+        return d
 
 def create_new_youtube_playlist(
     client: Client,
