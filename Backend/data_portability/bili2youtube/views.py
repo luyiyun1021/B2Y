@@ -5,15 +5,16 @@ from bili2youtube.models import UserIDMapping, VideoIDMapping
 import requests
 import bili2youtube.bilibili_utils.uploader as bili_utils_u
 def migrate_helloworld(request: HttpRequest) -> HttpResponse:
-    # mid = "1794123514"
-    # all_videos = bili_utils_u.get_all_videos_with_detailed_info(mid)
-    # all_series_with_video_ids = bili_utils_u.get_all_series_list_with_video_ids(mid)
-    # data = {
-    #     'videos': all_videos,
-    #     'sets': all_series_with_video_ids,
-    # }
-    # return JsonResponse({"status": "success", "data": data})
-    return HttpResponse("hello world!")
+    mid = "1794123514"
+    all_videos = bili_utils_u.get_all_videos_with_detailed_info(mid)
+    all_series_with_video_ids = bili_utils_u.get_all_series_list_with_video_ids(mid)
+    data = {
+        'videos': all_videos,
+        'sets': all_series_with_video_ids,
+    }
+    return JsonResponse({"status": "success", "data": data})
+    # return HttpResponse("hello world!")
+    # return JsonResponse({"status": "success", "data": "hello world!"})
 def migrate_uploader(request: HttpRequest) -> HttpResponse:
     try:
         ### TODO: Get Bilibili UID
