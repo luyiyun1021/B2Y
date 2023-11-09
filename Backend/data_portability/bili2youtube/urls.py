@@ -7,7 +7,4 @@ urlpatterns = [
     path("bilibili/qrcode", views.get_Bilibili_QRcode, name="login_bilibili_qrcode"),
     path("bilibili/qrcode/poll", views.check_Bilibili_QRcode, name="login_bilibili_qrcode_check"),
     path("B2Y/uploader", views.B2Y_get_uploader_info, name="B2Y_uploader_get"),
-
-    path("migrate_helloworld", views.migrate_helloworld, name="migrate_helloworld")
-
 ]
