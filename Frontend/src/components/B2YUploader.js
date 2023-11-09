@@ -1,7 +1,7 @@
 import "../styles/App.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { Collapse, Avatar, Button, Popconfirm, Col, Row } from "antd";
+import { Collapse, Avatar, Button, Popconfirm, Col, Row, Spin } from "antd";
 import { VideoList } from "./VideoList";
 import { SetList } from "./SetList";
 import { RollbackOutlined } from "@ant-design/icons";
@@ -9,42 +9,63 @@ import { RollbackOutlined } from "@ant-design/icons";
 let youtubeName = "Bob";
 let biliName = "Alice";
 
-let data = {
-  videos: [
-    {
-      id: 1,
-      title: "hello",
-      desc: "!",
-      img: "images/youtube.png",
-      like: 50,
-      star: 100,
-      comment: 150,
-      disable: false,
-      checked: false,
-    },
-    {
-      id: 2,
-      title: "world",
-      desc: "?",
-      img: "images/youtube.png",
-      like: 50,
-      star: 100,
-      comment: 150,
-      disable: false,
-      checked: false,
-    },
-  ],
-  sets: [
-    { id: 1, title: "set1", videoidx: [0] },
-    { id: 2, title: "set2", videoidx: [1] },
-  ],
-};
+// let data = {
+//   videos: [
+//     {
+//       id: 1,
+//       title: "hello",
+//       desc: "!",
+//       img: "images/youtube.png",
+//       like: 50,
+//       star: 100,
+//       comment: 150,
+//       disable: false,
+//       checked: false,
+//     },
+//     {
+//       id: 2,
+//       title: "world",
+//       desc: "?",
+//       img: "images/youtube.png",
+//       like: 50,
+//       star: 100,
+//       comment: 150,
+//       disable: false,
+//       checked: false,
+//     },
+//   ],
+//   sets: [
+//     { id: 1, title: "set1", video_ids: [1] },
+//     { id: 2, title: "set2", video_ids: [2] },
+//   ],
+// };
 
 export function B2YUploader() {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetch(
+        `http://localhost:8000/B2Y/uploader?SESSDATA=${sessionStorage.getItem(
+          "SESSDATA"
+        )}&access_token=${sessionStorage.getItem("access_token")}`,
+        { method: "get" }
+      )
+        .then(async (res) => await res.json())
+        .then((json) => {
+          let data = json.data;
+          if (data.videos === null) data.videos = [];
+          if (data.sets === null) data.sets = [];
+          console.log(data);
+          setData(data);
+          setCheckSetList(Array(data.sets.length).fill([]));
+        });
+    };
+    fetchData();
+  }, []);
+
   const [checkVideoList, setCheckVideoList] = useState([]);
-  const [checkSetList, setCheckSetList] = useState(
-    Array(data.sets.length).fill([])
-  );
+  const [checkSetList, setCheckSetList] = useState([]);
+
   const confirm = () =>
     new Promise((resolve) => {
       setTimeout(() => resolve(null), 3000);
@@ -57,19 +78,13 @@ export function B2YUploader() {
   ) {
     return <Navigate replace to="/login" />;
   } else {
-    fetch(
-      `http://localhost:8000/B2Y/uploader?SESSDATA=${sessionStorage.getItem(
-        "SESSDATA"
-      )}&access_token=${sessionStorage.getItem("access_token")}`,
-      { method: "get" }
-    )
-      .then(async (res) => {
-        let json = await res.json();
-        console.log(json);
-      })
-      .catch((err) => {
-        alert("Something wrong, please try to re-login.");
-      });
+    console.log(data);
+    if (data === null)
+      return (
+        <div style={{ top: "48%", left: "48%", position: "fixed" }}>
+          <Spin size="large"></Spin>
+        </div>
+      );
     return (
       <div style={{ margin: "2rem" }}>
         <Button
@@ -137,7 +152,7 @@ export function B2YUploader() {
 
         <div>
           <Collapse
-            defaultActiveKey={["0"]}
+            // defaultActiveKey={["0"]}
             expandIconPosition={"start"}
             items={[
               {
@@ -155,7 +170,7 @@ export function B2YUploader() {
             ]}
           />
           <Collapse
-            defaultActiveKey={["0"]}
+            // defaultActiveKey={["0"]}
             expandIconPosition={"start"}
             items={[
               {
@@ -171,7 +186,9 @@ export function B2YUploader() {
                         label: e.title,
                         children: (
                           <SetList
-                            data={e.videoidx.map((i) => data.videos[i])}
+                            // data={e.videoidx.map((i) => data.videos[i])}
+                            totalV={data.videos}
+                            data={e}
                             setCheckSet={setCheckSetList}
                             idx={i}
                             checkedVideo={checkVideoList}
@@ -185,8 +202,8 @@ export function B2YUploader() {
               },
             ]}
           />
-          <button onClick={() => console.log(checkSetList)}>click me1</button>
-          <button onClick={() => console.log(checkVideoList)}>click me2</button>
+          <button onClick={() => console.log(checkVideoList)}>click me1</button>
+          <button onClick={() => console.log(checkSetList)}>click me2</button>
         </div>
       </div>
     );

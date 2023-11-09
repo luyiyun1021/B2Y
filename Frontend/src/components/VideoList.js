@@ -6,7 +6,8 @@ import { List, Space, Checkbox } from "antd";
 export function VideoList(props) {
   const { data, checkVideoList, setCheckVideoList, uniqueID } = props;
   const checkAllVideo =
-    data.filter((e) => e.disable === false).length === checkVideoList.length;
+    data.filter((e) => e.disable === false).length === checkVideoList.length &&
+    checkVideoList.length !== 0;
   const onCheckAllChange = (e) => {
     data.forEach((t) => {
       let ele = document.getElementById(uniqueID + t.id);
@@ -46,23 +47,23 @@ export function VideoList(props) {
           actions={[
             <IconText
               icon={StarOutlined}
-              text="156"
+              text={item.star}
               key="list-vertical-star-o"
             />,
             <IconText
               icon={LikeOutlined}
-              text="156"
+              text={item.like}
               key="list-vertical-like-o"
             />,
             <IconText
               icon={MessageOutlined}
-              text="2"
+              text={item.comment}
               key="list-vertical-message"
             />,
           ]}
           extra={
             <>
-              <img width={250} src={item.img} alt="alt" /> <br></br>
+              <img width={250} src={item.img} alt={item.img} /> <br></br>
               <Checkbox
                 style={{ marginLeft: "180px" }}
                 id={uniqueID + item.id}
