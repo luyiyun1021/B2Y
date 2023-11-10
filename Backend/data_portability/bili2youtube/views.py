@@ -174,3 +174,82 @@ def B2Y_get_uploader_info(request: HttpRequest) -> HttpResponse:
         response["data"] = e.__str__()
         print(e.__str__())
         return JsonResponse(response)
+
+def B2Y_get_viewer_info(request: HttpRequest) -> HttpResponse:
+    try:
+        b_session_data = request.GET.get("SESSDATA")
+        y_access_token = request.GET.get("access_token")
+        # TODO
+        # data = {
+        # videos: [ ### Same as uploader videos, includes all videos in all playlist
+        #     {
+        #     id: "BV1LC4y1Z7Li",
+        #     bvid: "BV1LC4y1Z7Li",
+        #     aid: 789284286,
+        #     cid: 1291466320,
+        #     title: "Foggy Brown",
+        #     desc: "Bronw University Main Green on a foggy data",
+        #     img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
+        #     owner_mid: 1794123514,
+        #     owner_name: "robertmin96",
+        #     view: 6,
+        #     like: 0,
+        #     star: 0,
+        #     share: 0,
+        #     comment: 1,
+        #     disable: false,
+        #     checked: false,
+        #     },
+        # ],
+        # sets: [
+        #     {
+        #     id: 3737408,
+        #     title: "list3",
+        #     video_ids: ["BV1LC4y1Z7Li"], ### same as uploader, only need id
+        #     },
+        #     {
+        #     id: 3737407,
+        #     title: "list2",
+        #     video_ids: ["BV1y8411C7Mw"],
+        #     },
+        #     {
+        #     id: 3670927,
+        #     title: "list1",
+        #     video_ids: ["BV1LC4y1Z7Li", "BV1y8411C7Mw"],
+        #     },
+        # ],
+        # likes: [ ### same as uploader's videos, all infomation need.
+        #     {
+        #     id: "BV1LC4y1Z7Li",
+        #     bvid: "BV1LC4y1Z7Li",
+        #     aid: 789284286,
+        #     cid: 1291466320,
+        #     title: "Foggy Brown",
+        #     desc: "Bronw University Main Green on a foggy data",
+        #     img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
+        #     owner_mid: 1794123514,
+        #     owner_name: "robertmin96",
+        #     view: 6,
+        #     like: 0,
+        #     star: 0,
+        #     share: 0,
+        #     comment: 1,
+        #     disable: false,
+        #     checked: false,
+        #     },
+        # ],
+        # follow: [
+        #     { id: "1", name: "xxx", img: "img", disable: false, checked: false },
+        #     { id: "2", name: "yyy", img: "img", disable: false, checked: false },
+        #     { id: "3", name: "zzz", img: "img", disable: false, checked: false },
+        # ],
+        # };
+
+        return JsonResponse({"status": "success", "data": data})
+    except Exception as e:
+        # traceback.print_exc(e)
+        response = {}
+        response["result"] = "error_bad_datasource"
+        response["data"] = e.__str__()
+        print(e.__str__())
+        return JsonResponse(response)

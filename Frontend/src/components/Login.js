@@ -188,7 +188,11 @@ export function Login() {
       >
         Transfer as uploader
       </Button>
-      <Button disabled={Bsignined && Ysignined ? false : true} size="large">
+      <Button
+        disabled={Bsignined && Ysignined ? false : true}
+        size="large"
+        onClick={() => (window.location.href = "/B2YViewer")}
+      >
         Transfer as viewer
       </Button>
       <FloatButton

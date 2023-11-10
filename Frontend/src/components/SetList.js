@@ -11,10 +11,10 @@ export function SetList(props) {
     data.video_ids.filter((e) => checkedVideo.includes(e)).length ===
       checkVideoList.length && checkVideoList.length !== 0;
   const onCheckAllChange = (e) => {
-    totalV
-      .filter((e) => data.video_ids.includes(e.id))
+    data.video_ids
+      // .filter((e) => data.video_ids.includes(e.id))
       .forEach((t) => {
-        let ele = document.getElementById(uniqueID + t.id);
+        let ele = document.getElementById(uniqueID + t);
         if (e.target.checked) {
           if (!ele.checked) ele.click();
         } else {
