@@ -3,7 +3,7 @@ import math
 import subprocess
 import time
 from fake_useragent import UserAgent
-from Backend.data_portability.bili2youtube.youtube_utils import *
+from ..youtube_utils import *
 
 SESSION_ID = ''
 VIDEO_DOWNLOAD_PATH = "/Users/ziranmin/Downloads/"

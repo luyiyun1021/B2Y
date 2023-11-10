@@ -1,6 +1,6 @@
 import requests
 import math
-from Backend.data_portability.bili2youtube.youtube_utils import *
+from ..youtube_utils import *
 
 
 SESSION_ID = ''
