@@ -1,7 +1,7 @@
 import requests
 import math
 from ..youtube_utils import *
-
+# from Backend.data_portability.bili2youtube.youtube_utils import *
 
 SESSION_ID = ''
 
@@ -166,14 +166,41 @@ if __name__ == '__main__':
 
     mid = 1794123514 # Ziran's user id
 
+    # print(create_youtube_playlist_for_viewer(mid))
 
-    print(create_youtube_playlist_for_viewer(mid))
+    # youtube_access_token = "ya29.a0AfB_byDuDRuoDOPMwcNJJjONcbLEncPYf8n6Oym0u2zd__mnvWsKvnz4ZobE0uQ-_nyruDGGdLFa-Jmz5XAlxn-EL7mNMc0w-r3bxyoa0ujqfsMgZbKbhwR50AQsfulI4Hrz8St-5ap9iGrEJblB5l9G63a-VJux9LdFaCgYKAckSARASFQHGX2Mi0gy7eIZ5jnnsALXjKHuKvw0171"
+    # youtube_client = Client(access_token=youtube_access_token)
+    #
+    # ## Get Youtube channel ID
+    # yuid = get_channel_id(youtube_client)
+    # print("yuid:", yuid)
+
+
+    # 王局 UCBKDRq35-L8xev4O7ZqBeLg
+    # tennis warehouse UCmgyIibKmFosnm-LyZEB7uQ
+    # subscribe_youtube_channel(youtube_client, "UCmgyIibKmFosnm-LyZEB7uQ")
+
+    # rate_video(youtube_client, "Ygr7JQ12F-g", "like")
+
+    # # Get Bilbili playlists
+    # playlist = PlaylistInfo(
+    #     title='second list',
+    #     description='this is my first list for testing',
+    #     tags=[],
+    #     defaultLanguage="en",
+    #     privacyStatus="public",
+    #     platform=Platform.BILIBILI,
+    #     videoList=["lCrlWTPq4qE", "cN07i8Puqzs", "dsgsdrtyer"],
+    # )
+    #
+    # create_new_youtube_playlist(youtube_client, playlist)
+
+    # UserIDMapping.objects.create(buid="520819684", yuid="UCilwQlk62k1z7aUEZPOB6yw")
 
 
 
 
-
-
+    # print(create_youtube_playlist_for_viewer(mid))
 
     # v1 = VideoInfo(
     #     filename="xxx",

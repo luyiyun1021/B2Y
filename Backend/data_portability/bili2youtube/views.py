@@ -53,9 +53,11 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
 
         ### Migrate uploader's playlists
         for bplaylist in bplaylists:
-            yplaylist = bplaylist.copy()
+            bVideoList = bplaylist.videoList.copy()
+            yplaylist = bplaylist
+            yplaylist.videoList = []
             yplaylist.platform = youtube_utils.Platform.YOUTUBE
-            for bvid in bplaylist.videoList:
+            for bvid in bVideoList:
                 if VideoIDMapping.objects.filter(bvid=bvid).exists():
                     yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
                     yplaylist.videoList.append(yvid)
@@ -73,7 +75,8 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
 
 def migrate_viewer(request: HttpRequest) -> HttpResponse:
     b_session_data = request.GET.get("SESSDATA")
-    y_access_token = request.GET.get("access_token")
+    youtube_access_token = request.GET.get("access_token")
+
     user = bili_utils_u.get_user_info(b_session_data)
     mid = user['mid']
 
@@ -94,7 +97,6 @@ def migrate_viewer(request: HttpRequest) -> HttpResponse:
             bratings.append((video['bvid'], 'like'))
 
         ### Initialize YouTube client
-        youtube_access_token = request.GET.get("youtube_access_token")
         youtube_client = Client(access_token=youtube_access_token)
 
         ### migrate subscription list
@@ -105,20 +107,15 @@ def migrate_viewer(request: HttpRequest) -> HttpResponse:
 
         ### migrate playlists
         for bplaylist in bplaylists:
-            yplaylist = bplaylist.copy()
+            bVideoList = bplaylist.videoList.copy()
+            yplaylist = bplaylist
+            yplaylist.videoList = []
             yplaylist.platform = youtube_utils.Platform.YOUTUBE
-            for bvid in bplaylist.videoList:
+            for bvid in bVideoList:
                 if VideoIDMapping.objects.filter(bvid=bvid).exists():
                     yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
                     yplaylist.videoList.append(yvid)
             youtube_utils.create_new_youtube_playlist(youtube_client, yplaylist)
-
-        ### migrate ratings
-        for brating in bratings:
-            bvid, rating = brating
-            if VideoIDMapping.objects.filter(bvid=bvid).exists():
-                yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
-                youtube_utils.rate_video(youtube_client, yvid, rating)
 
         return JsonResponse({"status": "success", "data": "Hello, world!"})
     except Exception as e:

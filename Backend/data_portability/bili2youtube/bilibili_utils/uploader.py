@@ -4,6 +4,7 @@ import subprocess
 import time
 from fake_useragent import UserAgent
 from ..youtube_utils import *
+#from Backend.data_portability.bili2youtube.youtube_utils import *
 
 SESSION_ID = ''
 VIDEO_DOWNLOAD_PATH = "/Users/ziranmin/Downloads/"
@@ -18,6 +19,7 @@ def get_user_info(session_id=SESSION_ID):
         user = {}
         user['uname'] = json_response['data']['uname']
         user['mid'] = json_response['data']['mid']
+        user['profile_pic'] = json_response['data']['face']
         return user
 
     except Exception as error:
@@ -336,7 +338,7 @@ def create_youtube_playlist_for_uploader(mid):
                     description=series['description'],
                     tags=[],
                     defaultLanguage="en",
-                    privacyStatus="private",
+                    privacyStatus="public",
                     platform=Platform.BILIBILI,
                     videoList=youtube_video_list,
                 )
@@ -359,7 +361,7 @@ def get_and_download_all_videos_from_bilibili_for_youtube(mid, session_id=SESSIO
             download_video(bvid, vurl, qn, path)
 
             youtube_video = VideoInfo(
-                filename=VIDEO_DOWNLOAD_PATH + bvid + '_' + str(VIDEO_DOWNLOAD_QUALITY_ID) + '_test_' + '.mp4',
+                filename=VIDEO_DOWNLOAD_PATH + bvid + '_' + str(VIDEO_DOWNLOAD_QUALITY_ID) + '.mp4',
                 title=video_info['title'],
                 platform=Platform.BILIBILI,
                 id=bvid,
@@ -378,12 +380,12 @@ if __name__ == '__main__':
 
     mid = '1794123514'
 
-    print(create_youtube_playlist_for_uploader(mid))
+    # print(create_youtube_playlist_for_uploader(mid))
 
-    print(get_and_download_all_videos_from_bilibili_for_youtube(mid))
+    # print(get_and_download_all_videos_from_bilibili_for_youtube(mid))
 
 
-    # # print out own account info by using the session id got from QR code login
+    # print out own account info by using the session id got from QR code login
     # print("print out own account info by using the session id got from QR code login")
     # user = get_user_info(SESSION_ID)
     # print(user)
