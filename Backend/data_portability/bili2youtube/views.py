@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from pyyoutube import Client
 import bili2youtube.youtube_utils as youtube_utils
@@ -12,6 +13,12 @@ VIDEO_DOWNLOAD_QUALITY_ID = 32 # 清晰度参考 https://github.com/SocialSister
 def migrate_uploader(request: HttpRequest) -> HttpResponse:
     try:
         b_session_data = request.GET.get("SESSDATA")
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        videos_ids = body.get("videos")
+        sets_ids = body.get("sets")
+        # TDOD migration...
+        
         user = bili_utils_u.get_user_info(b_session_data)
         # Get Bilibili UID
         buid = user['mid']
@@ -76,6 +83,12 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
 def migrate_viewer(request: HttpRequest) -> HttpResponse:
     b_session_data = request.GET.get("SESSDATA")
     youtube_access_token = request.GET.get("access_token")
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    sets_ids = body.get("sets")
+    likes_ids = body.get("likes")
+    follow_ids = body.get("follow")
+    # TDOD migration...
 
     user = bili_utils_u.get_user_info(b_session_data)
     mid = user['mid']
@@ -155,6 +168,7 @@ def B2Y_get_uploader_info(request: HttpRequest) -> HttpResponse:
     try:
         b_session_data = request.GET.get("SESSDATA")
         y_access_token = request.GET.get("access_token")
+        b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
         user = bili_utils_u.get_user_info(b_session_data)
         mid = user['mid']
         all_videos = bili_utils_u.get_all_videos_with_detailed_info(mid)
@@ -176,7 +190,7 @@ def B2Y_get_viewer_info(request: HttpRequest) -> HttpResponse:
     try:
         b_session_data = request.GET.get("SESSDATA")
         y_access_token = request.GET.get("access_token")
-
+        b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
         user = bili_utils_u.get_user_info(b_session_data)
         mid = user['mid']
         videos, sets = bili_utils_v.get_collections_with_video_ids_and_all_videos_info(mid, session_id=b_session_data)

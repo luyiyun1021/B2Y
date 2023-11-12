@@ -82,7 +82,6 @@ export function B2YUploader() {
           let data = json.data;
           if (data.videos === null) data.videos = [];
           if (data.sets === null) data.sets = [];
-          console.log(data);
           setData(data);
           setCheckSetList(Array(data.sets.length).fill([]));
         });
@@ -96,10 +95,25 @@ export function B2YUploader() {
     []
   );
 
-  const confirm = () =>
-    new Promise((resolve) => {
-      setTimeout(() => resolve(null), 3000);
-    });
+  const confirm = async () => {
+    await fetch(
+      `http://localhost:8000/B2Y/migrate_viewer?SESSDATA=${sessionStorage.getItem(
+        "SESSDATA"
+      )}&access_token=${sessionStorage.getItem("access_token")}`,
+      {
+        method: "post",
+        body: JSON.stringify({ videos: [1, 2, 3], sets: checkSetList }),
+      }
+    )
+      .then(async (res) => await res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          alert("Migration Successed!");
+        } else {
+          alert("Migration Failed!");
+        }
+      });
+  };
 
   if (
     sessionStorage.getItem("SESSDATA") == null ||
@@ -108,7 +122,6 @@ export function B2YUploader() {
   ) {
     return <Navigate replace to="/login" />;
   } else {
-    console.log(data);
     if (data === null)
       return (
         <div style={{ top: "48%", left: "48%", position: "fixed" }}>
@@ -145,6 +158,12 @@ export function B2YUploader() {
                   </p>
                   <p>Total Set: {data.sets.length}</p>
                   {/* //TODO make accurate */}
+                  <p>
+                    <b>Once the migration operation is confirmed,</b>
+                  </p>
+                  <p>
+                    <b>it cannot be stopped.</b>
+                  </p>
                 </>
               }
               onConfirm={confirm}
@@ -162,6 +181,12 @@ export function B2YUploader() {
                   <p>
                     Total Set:{" "}
                     {checkSetList.filter((e) => e.length !== 0).length}
+                  </p>
+                  <p>
+                    <b>Once the migration operation is confirmed,</b>
+                  </p>
+                  <p>
+                    <b>it cannot be stopped.</b>
                   </p>
                 </>
               }

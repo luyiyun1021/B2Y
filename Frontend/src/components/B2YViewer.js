@@ -136,7 +136,6 @@ export function B2YViewer() {
           if (data.sets === null) data.sets = [];
           if (data.likes === null) data.likes = [];
           if (data.follow === null) data.follow = [];
-          console.log(data);
           setData(data);
           setCheckSetList(Array(data.sets.length).fill([]));
         });
@@ -151,10 +150,29 @@ export function B2YViewer() {
   const [checkLikesList, setCheckLikesList] = useState([]);
   const [checkFollowList, setCheckFollowList] = useState([]);
 
-  const confirm = () =>
-    new Promise((resolve) => {
-      setTimeout(() => resolve(null), 3000);
-    });
+  const confirm = async () => {
+    await fetch(
+      `http://localhost:8000/B2Y/migrate_uploader?SESSDATA=${sessionStorage.getItem(
+        "SESSDATA"
+      )}&access_token=${sessionStorage.getItem("access_token")}`,
+      {
+        method: "post",
+        body: JSON.stringify({
+          sets: checkSetList,
+          liks: checkLikesList,
+          follow: checkFollowList,
+        }),
+      }
+    )
+      .then(async (res) => await res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          alert("Migration Successed!");
+        } else {
+          alert("Migration Failed!");
+        }
+      });
+  };
 
   if (
     sessionStorage.getItem("SESSDATA") == null ||
@@ -215,6 +233,12 @@ export function B2YViewer() {
                       ).length
                     }
                   </p>
+                  <p>
+                    <b>Once the migration operation is confirmed,</b>
+                  </p>
+                  <p>
+                    <b>it cannot be stopped.</b>
+                  </p>
                 </>
               }
               onConfirm={confirm}
@@ -234,6 +258,12 @@ export function B2YViewer() {
                   </p>
                   <p>Total Likes: {checkLikesList.length}</p>
                   <p>Total Follows: {checkFollowList.length}</p>
+                  <p>
+                    <b>Once the migration operation is confirmed,</b>
+                  </p>
+                  <p>
+                    <b>it cannot be stopped.</b>
+                  </p>
                 </>
               }
               onConfirm={confirm}
