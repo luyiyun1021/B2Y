@@ -5,22 +5,21 @@ import { useState, useEffect } from "react";
 import { List, Space, Checkbox } from "antd";
 
 export function SetList(props) {
-  const { totalV, data, setCheckSet, idx, checkedVideo, uniqueID } = props;
+  const { totalV, data, setCheckSet, idx, checkedVideo } = props;
   const [checkVideoList, setCheckVideoList] = useState([]);
   const checkAllVideo =
     data.video_ids.filter((e) => checkedVideo.includes(e)).length ===
       checkVideoList.length && checkVideoList.length !== 0;
   const onCheckAllChange = (e) => {
-    data.video_ids
-      // .filter((e) => data.video_ids.includes(e.id))
-      .forEach((t) => {
-        let ele = document.getElementById(uniqueID + t);
-        if (e.target.checked) {
-          if (!ele.checked) ele.click();
-        } else {
-          if (ele.checked) ele.click();
-        }
-      });
+    data.video_ids.forEach((t) => {
+      if (e.target.checked) {
+        if (!checkVideoList.includes(t) && checkedVideo.includes(t))
+          setCheckVideoList((arr) => [...arr, t]);
+      } else {
+        if (checkVideoList.includes(t))
+          setCheckVideoList((arr) => arr.filter((i) => i !== t));
+      }
+    });
   };
   const IconText = ({ icon, text }) => (
     <Space>
@@ -59,17 +58,17 @@ export function SetList(props) {
           actions={[
             <IconText
               icon={StarOutlined}
-              text="156"
+              text={item.star}
               key="list-vertical-star-o"
             />,
             <IconText
               icon={LikeOutlined}
-              text="156"
+              text={item.like}
               key="list-vertical-like-o"
             />,
             <IconText
               icon={MessageOutlined}
-              text="2"
+              text={item.comment}
               key="list-vertical-message"
             />,
           ]}
@@ -78,7 +77,6 @@ export function SetList(props) {
               <img width={250} src={item.img} alt="alt" /> <br></br>
               <Checkbox
                 style={{ marginLeft: "180px" }}
-                id={uniqueID + item.id}
                 disabled={!checkedVideo.includes(item.id)}
                 onChange={(e) => {
                   e.target.checked
@@ -87,6 +85,7 @@ export function SetList(props) {
                         arr.filter((i) => i !== item.id)
                       );
                 }}
+                checked={checkVideoList.includes(item.id)}
               >
                 check
               </Checkbox>

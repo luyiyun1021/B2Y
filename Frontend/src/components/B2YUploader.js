@@ -194,7 +194,6 @@ export function B2YUploader() {
                     data={data.videos}
                     checkVideoList={checkVideoList}
                     setCheckVideoList={setCheckVideoList}
-                    uniqueID={"0001"}
                   ></VideoList>
                 ),
               },
@@ -217,13 +216,11 @@ export function B2YUploader() {
                         label: e.title,
                         children: (
                           <SetList
-                            // data={e.videoidx.map((i) => data.videos[i])}
                             totalV={data.videos}
                             data={e}
                             setCheckSet={setCheckSetList}
                             idx={i}
                             checkedVideo={checkVideoList}
-                            uniqueID={i + "0002"}
                           ></SetList>
                         ),
                       },

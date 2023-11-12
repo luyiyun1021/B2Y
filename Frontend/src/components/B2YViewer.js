@@ -133,8 +133,9 @@ export function B2YViewer() {
         .then(async (res) => await res.json())
         .then((json) => {
           let data = json.data;
-          if (data.videos === null) data.videos = [];
           if (data.sets === null) data.sets = [];
+          if (data.likes === null) data.likes = [];
+          if (data.follow === null) data.follow = [];
           console.log(data);
           setData(data);
           setCheckSetList(Array(data.sets.length).fill([]));
@@ -296,7 +297,6 @@ export function B2YViewer() {
                     data={data.likes}
                     checkVideoList={checkLikesList}
                     setCheckVideoList={setCheckLikesList}
-                    uniqueID={"0001"}
                   ></VideoList>
                 ),
               },

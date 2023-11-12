@@ -4,17 +4,18 @@ import React from "react";
 import { List, Space, Checkbox } from "antd";
 
 export function VideoList(props) {
-  const { data, checkVideoList, setCheckVideoList, uniqueID } = props;
+  const { data, checkVideoList, setCheckVideoList } = props;
   const checkAllVideo =
     data.filter((e) => e.disable === false).length === checkVideoList.length &&
     checkVideoList.length !== 0;
   const onCheckAllChange = (e) => {
     data.forEach((t) => {
-      let ele = document.getElementById(uniqueID + t.id);
       if (e.target.checked) {
-        if (!ele.checked) ele.click();
+        if (!checkVideoList.includes(t.id))
+          setCheckVideoList((arr) => [...arr, t.id]);
       } else {
-        if (ele.checked) ele.click();
+        if (checkVideoList.includes(t.id))
+          setCheckVideoList((arr) => arr.filter((i) => i !== t.id));
       }
     });
   };
@@ -66,7 +67,6 @@ export function VideoList(props) {
               <img width={250} src={item.img} alt={item.img} /> <br></br>
               <Checkbox
                 style={{ marginLeft: "180px" }}
-                id={uniqueID + item.id}
                 onChange={(e) =>
                   e.target.checked
                     ? setCheckVideoList((arr) => [...arr, item.id])
@@ -74,6 +74,7 @@ export function VideoList(props) {
                         arr.filter((i) => i !== item.id)
                       )
                 }
+                checked={checkVideoList.includes(item.id)}
               >
                 check
               </Checkbox>
