@@ -1,8 +1,8 @@
 import requests
 import math
 # from ..youtube_utils import *
-from Backend.data_portability.bili2youtube.youtube_utils import *
-import Backend.data_portability.bili2youtube.bilibili_utils.uploader as bili_utils_u
+from ..youtube_utils import *
+from ..bilibili_utils import uploader as bili_utils_u
 
 SESSION_ID = ''
 
