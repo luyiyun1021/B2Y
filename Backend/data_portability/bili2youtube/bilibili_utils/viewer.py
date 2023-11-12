@@ -1,7 +1,8 @@
 import requests
 import math
-from ..youtube_utils import *
-# from Backend.data_portability.bili2youtube.youtube_utils import *
+# from ..youtube_utils import *
+from Backend.data_portability.bili2youtube.youtube_utils import *
+import Backend.data_portability.bili2youtube.bilibili_utils.uploader as bili_utils_u
 
 SESSION_ID = ''
 
@@ -33,7 +34,16 @@ def get_followings_list(mid, page_size=10, session_id=SESSION_ID):
             json_response = response.json()
             following_list = json_response['data']['list']
             for item in following_list:
-                followed_user = {'mid': item['mid'], 'uname': item['uname']}
+                # followed_user = {'mid': item['mid'],
+                #                  'uname': item['uname'],
+                #                  'profile_pic': item['face']
+                #                  }
+                followed_user = {'id': item['mid'],
+                                 'name': item['uname'],
+                                 'img': item['face'],
+                                 'disable': False,
+                                 'checked': False,
+                                 }
                 res.append(followed_user)
         return res
     except Exception as error:
@@ -150,21 +160,63 @@ def get_like_history(mid):
         res = []
         video_list = json_response['data']['list']
         for item in video_list:
-            video = {'bvid':item['bvid'],
-                     'title': item['title'],
-                     'owner': {
-                        'mid': item['owner']['mid'],
-                        'name': item['owner']['name'],
-                     }}
-            res.append(video)
+            # video = {'bvid':item['bvid'],
+            #          'title': item['title'],
+            #          'owner': {
+            #             'mid': item['owner']['mid'],
+            #             'name': item['owner']['name'],
+            #          }}
+            # res.append(video)
+            res.append(bili_utils_u.get_video_info(item['bvid']))
         return res
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
+def get_collections_with_video_ids_and_all_videos_info(mid, session_id=SESSION_ID):
+    try:
+        collection_with_video_ids = []
+        video_id_set = set()
+        all_videos_info = []
+        folder_list = get_collection_folders(mid)
+        for folder in folder_list:
+            folder_id = folder['id']
+            collection_videos = get_collection_videos_from_a_folder(folder_id, session_id=session_id)
+            videos = []
+            for video in collection_videos:
+                videos.append(video['bvid'])
+                video_id_set.add(video['bvid'])
+            playlist = {
+                'id': folder['id'],
+                'title': folder['title'],
+                'video_ids': videos,
+            }
+            collection_with_video_ids.append(playlist)
+        for vid in video_id_set:
+            all_videos_info.append(bili_utils_u.get_video_info(vid))
+        return all_videos_info, collection_with_video_ids
+    except Exception as error:
+        print("An exception occurred:", type(error).__name__, "–", error)
+
+
+
 
 if __name__ == '__main__':
     print("hello world")
 
     mid = 1794123514 # Ziran's user id
+
+    videos, sets = get_collections_with_video_ids_and_all_videos_info(mid)
+    likes = get_like_history(mid)
+    follow = get_followings_list(mid)
+    data = {
+        'videos': videos,
+        'sets': sets,
+        'likes': likes,
+        'follow': follow,
+    }
+    print(data['videos'])
+    print(data['sets'])
+    print(data['likes'])
+    print(data['follow'])
 
     # print(create_youtube_playlist_for_viewer(mid))
 
@@ -195,35 +247,10 @@ if __name__ == '__main__':
     #
     # create_new_youtube_playlist(youtube_client, playlist)
 
-    # UserIDMapping.objects.create(buid="520819684", yuid="UCilwQlk62k1z7aUEZPOB6yw")
 
 
 
-
-    # print(create_youtube_playlist_for_viewer(mid))
-
-    # v1 = VideoInfo(
-    #     filename="xxx",
-    #     title="zzz",
-    #     platform=Platform.BILIBILI,
-    #     id="bvid00000",
-    #     description="",
-    #     tags=[],
-    #     privacyStatus="private",
-    # )
-    # print(v1)
-
-
-
-
-
-
-
-
-
-
-
-    # get a list of accounts that the given user is following
+    # # get a list of accounts that the given user is following
     # print("get a list of accounts that the given user is following")
     # following_list = get_followings_list(1794123514)
     # for x in following_list:
@@ -235,7 +262,6 @@ if __name__ == '__main__':
     # folder_list = get_collection_folders(mid)
     # for x in folder_list:
     #     print(x)
-    #
     #
     # # get all the videos from one of the collections folders
     # print("get all the videos from one of the collections folders")
@@ -250,5 +276,5 @@ if __name__ == '__main__':
     # liked_videos = get_like_history(mid)
     # for video in liked_videos:
     #     print(video)
-    #
+
 
