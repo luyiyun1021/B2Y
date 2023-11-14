@@ -195,7 +195,7 @@ def B2Y_get_viewer_info(request: HttpRequest) -> HttpResponse:
         mid = user['mid']
         videos, sets = bili_utils_v.get_collections_with_video_ids_and_all_videos_info(mid, session_id=b_session_data)
         likes = bili_utils_v.get_like_history(mid)
-        follow = bili_utils_v.get_followings_list(mid)
+        follow = bili_utils_v.get_followings_list(mid,session_id=b_session_data)
         data = {
             'videos': videos,
             'sets': sets,
