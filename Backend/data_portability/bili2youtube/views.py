@@ -174,6 +174,8 @@ def B2Y_get_uploader_info(request: HttpRequest) -> HttpResponse:
         all_videos = bili_utils_u.get_all_videos_with_detailed_info(mid)
         all_series_with_video_ids = bili_utils_u.get_all_series_list_with_video_ids(mid)
         data = {
+            'user_name': user['uname'],
+            'user_profile': user['profile_pic'],
             'videos': all_videos,
             'sets': all_series_with_video_ids,
         }
@@ -197,6 +199,8 @@ def B2Y_get_viewer_info(request: HttpRequest) -> HttpResponse:
         likes = bili_utils_v.get_like_history(mid)
         follow = bili_utils_v.get_followings_list(mid,session_id=b_session_data)
         data = {
+            'user_name': user['uname'],
+            'user_profile': user['profile_pic'],
             'videos': videos,
             'sets': sets,
             'likes': likes,
