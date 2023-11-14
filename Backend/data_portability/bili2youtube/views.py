@@ -78,8 +78,70 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
         response["data"] = e.__str__()
         print(e.__str__())
         return JsonResponse(response)
+def migrate_uploader_all(request: HttpRequest) -> HttpResponse:
+    try:
+        b_session_data = request.GET.get("SESSDATA")
+        user = bili_utils_u.get_user_info(b_session_data)
+        # Get Bilibili UID
+        buid = user['mid']
 
+        ### Initialize YouTube client
+        youtube_access_token = request.GET.get("youtube_access_token")
+        youtube_client = Client(access_token=youtube_access_token)
 
+        ## Get Youtube channel ID
+        yuid = youtube_utils.get_channel_id(youtube_client)
+
+        ### Store the map between Bilibili UID and YouTube UID
+        if (
+                not UserIDMapping.objects.filter(buid=buid).exists()
+                and not UserIDMapping.objects.filter(yuid=yuid).exists()
+        ):
+            UserIDMapping.objects.create(buid=buid, yuid=yuid)
+        else:
+            return JsonResponse(
+                {"status": "success", "data": "Already migrated this user!"}
+            )
+
+        # Download Bilibili videos
+        bvideos = bili_utils_u.get_and_download_all_videos_from_bilibili_for_youtube(buid, session_id=b_session_data,
+                                                                                     qn=VIDEO_DOWNLOAD_QUALITY_ID,
+                                                                                     path=VIDEO_DOWNLOAD_PATH)
+
+        ### Upload Bilibili videos to YouTube, use multi-processing to speed up
+        yvideo_ids = youtube_utils.upload_videos(youtube_client, bvideos)
+
+        ### Store the map between Bilibili UID and YouTube UID
+        for yvideo_id, bvideo in zip(yvideo_ids, bvideos):
+            if (
+                    not VideoIDMapping.objects.filter(bvid=bvideo.id).exists()
+                    and not VideoIDMapping.objects.filter(yvid=yvideo_id).exists()
+            ):
+                VideoIDMapping.objects.create(bvid=bvideo.id, yvid=yvideo_id)
+
+        # Get Bilbili playlists
+        bplaylists = bili_utils_u.create_youtube_playlist_for_uploader(buid)
+
+        ### Migrate uploader's playlists
+        for bplaylist in bplaylists:
+            bVideoList = bplaylist.videoList.copy()
+            yplaylist = bplaylist
+            yplaylist.videoList = []
+            yplaylist.platform = youtube_utils.Platform.YOUTUBE
+            for bvid in bVideoList:
+                if VideoIDMapping.objects.filter(bvid=bvid).exists():
+                    yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
+                    yplaylist.videoList.append(yvid)
+            youtube_utils.create_new_youtube_playlist(youtube_client, yplaylist)
+
+        return JsonResponse({"status": "success", "data": "Hello, world!"})
+    except Exception as e:
+        # traceback.print_exc(e)
+        response = {}
+        response["result"] = "error_bad_datasource"
+        response["data"] = e.__str__()
+        print(e.__str__())
+        return JsonResponse(response)
 def migrate_viewer(request: HttpRequest) -> HttpResponse:
     b_session_data = request.GET.get("SESSDATA")
     youtube_access_token = request.GET.get("access_token")
@@ -90,6 +152,58 @@ def migrate_viewer(request: HttpRequest) -> HttpResponse:
     follow_ids = body.get("follow")
     # TDOD migration...
 
+    user = bili_utils_u.get_user_info(b_session_data)
+    mid = user['mid']
+
+    try:
+        # Get Bilibili subscription list
+        following_list = bili_utils_v.get_followings_list(mid, session_id=b_session_data)
+        bsub_list = []
+        for x in following_list:
+            bsub_list.append(x['mid'])
+
+        # Get Bilbili playlists
+        bplaylists = bili_utils_v.create_youtube_playlist_for_viewer(mid, session_id=b_session_data)
+
+        # Get Bilibili ratings
+        liked_videos = bili_utils_v.get_like_history(mid)
+        bratings = []
+        for video in liked_videos:
+            bratings.append((video['bvid'], 'like'))
+
+        ### Initialize YouTube client
+        youtube_client = Client(access_token=youtube_access_token)
+
+        ### migrate subscription list
+        for buid in bsub_list:
+            if UserIDMapping.objects.filter(buid=buid).exists():
+                yuid = UserIDMapping.objects.get(buid=buid).yuid
+                youtube_utils.subscribe_youtube_channel(youtube_client, yuid)
+
+        ### migrate playlists
+        for bplaylist in bplaylists:
+            bVideoList = bplaylist.videoList.copy()
+            yplaylist = bplaylist
+            yplaylist.videoList = []
+            yplaylist.platform = youtube_utils.Platform.YOUTUBE
+            for bvid in bVideoList:
+                if VideoIDMapping.objects.filter(bvid=bvid).exists():
+                    yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
+                    yplaylist.videoList.append(yvid)
+            youtube_utils.create_new_youtube_playlist(youtube_client, yplaylist)
+
+        return JsonResponse({"status": "success", "data": "Hello, world!"})
+    except Exception as e:
+        # traceback.print_exc(e)
+        response = {}
+        response["result"] = "error_bad_datasource"
+        response["data"] = e.__str__()
+        print(e.__str__())
+        return JsonResponse(response)
+
+def migrate_viewer_all(request: HttpRequest) -> HttpResponse:
+    b_session_data = request.GET.get("SESSDATA")
+    youtube_access_token = request.GET.get("access_token")
     user = bili_utils_u.get_user_info(b_session_data)
     mid = user['mid']
 
