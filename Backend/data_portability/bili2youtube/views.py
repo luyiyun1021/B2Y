@@ -24,7 +24,7 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
         buid = user['mid']
 
         ### Initialize YouTube client
-        youtube_access_token = request.GET.get("youtube_access_token")
+        youtube_access_token = request.GET.get("access_token")
         youtube_client = Client(access_token=youtube_access_token)
 
         ## Get Youtube channel ID
@@ -84,13 +84,13 @@ def migrate_uploader_all(request: HttpRequest) -> HttpResponse:
         user = bili_utils_u.get_user_info(b_session_data)
         # Get Bilibili UID
         buid = user['mid']
-
         ### Initialize YouTube client
-        youtube_access_token = request.GET.get("youtube_access_token")
+        youtube_access_token = request.GET.get("access_token")
         youtube_client = Client(access_token=youtube_access_token)
 
         ## Get Youtube channel ID
         yuid = youtube_utils.get_channel_id(youtube_client)
+
 
         ### Store the map between Bilibili UID and YouTube UID
         if (
@@ -160,7 +160,7 @@ def migrate_viewer(request: HttpRequest) -> HttpResponse:
         following_list = bili_utils_v.get_followings_list(mid, session_id=b_session_data)
         bsub_list = []
         for x in following_list:
-            bsub_list.append(x['mid'])
+            bsub_list.append(x['id'])
 
         # Get Bilbili playlists
         bplaylists = bili_utils_v.create_youtube_playlist_for_viewer(mid, session_id=b_session_data)
@@ -192,6 +192,13 @@ def migrate_viewer(request: HttpRequest) -> HttpResponse:
                     yplaylist.videoList.append(yvid)
             youtube_utils.create_new_youtube_playlist(youtube_client, yplaylist)
 
+        ### migrate ratings
+        for brating in bratings:
+            bvid, rating = brating
+            if VideoIDMapping.objects.filter(bvid=bvid).exists():
+                yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
+                print(yvid)
+                youtube_utils.rate_video(youtube_client, yvid, rating)
         return JsonResponse({"status": "success", "data": "Hello, world!"})
     except Exception as e:
         # traceback.print_exc(e)
@@ -212,7 +219,7 @@ def migrate_viewer_all(request: HttpRequest) -> HttpResponse:
         following_list = bili_utils_v.get_followings_list(mid, session_id=b_session_data)
         bsub_list = []
         for x in following_list:
-            bsub_list.append(x['mid'])
+            bsub_list.append(x['id'])
 
         # Get Bilbili playlists
         bplaylists = bili_utils_v.create_youtube_playlist_for_viewer(mid, session_id=b_session_data)
@@ -243,6 +250,14 @@ def migrate_viewer_all(request: HttpRequest) -> HttpResponse:
                     yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
                     yplaylist.videoList.append(yvid)
             youtube_utils.create_new_youtube_playlist(youtube_client, yplaylist)
+
+        ### migrate ratings
+        for brating in bratings:
+            bvid, rating = brating
+            if VideoIDMapping.objects.filter(bvid=bvid).exists():
+                yvid = VideoIDMapping.objects.get(bvid=bvid).yvid
+                print(yvid)
+                youtube_utils.rate_video(youtube_client, yvid, rating)
 
         return JsonResponse({"status": "success", "data": "Hello, world!"})
     except Exception as e:

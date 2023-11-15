@@ -367,7 +367,7 @@ def get_and_download_all_videos_from_bilibili_for_youtube(mid, session_id=SESSIO
                 id=bvid,
                 description=video_info['desc'],
                 tags=video_tags,
-                privacyStatus="private",
+                privacyStatus="public",
             )
             bvideos.append(youtube_video)
         return bvideos
