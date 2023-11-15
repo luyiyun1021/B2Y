@@ -152,7 +152,7 @@ export function B2YViewer() {
 
   const confirm = async () => {
     await fetch(
-      `http://localhost:8000/B2Y/migrate_uploader?SESSDATA=${sessionStorage.getItem(
+      `http://localhost:8000/B2Y/migrate_viewer?SESSDATA=${sessionStorage.getItem(
         "SESSDATA"
       )}&access_token=${sessionStorage.getItem("access_token")}`,
       {
@@ -162,6 +162,25 @@ export function B2YViewer() {
           liks: checkLikesList,
           follow: checkFollowList,
         }),
+      }
+    )
+      .then(async (res) => await res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          alert("Migration Successed!");
+        } else {
+          alert("Migration Failed!");
+        }
+      });
+  };
+
+  const confirmAll = async () => {
+    await fetch(
+      `http://localhost:8000/B2Y/migrate_viewer_all?SESSDATA=${sessionStorage.getItem(
+        "SESSDATA"
+      )}&access_token=${sessionStorage.getItem("access_token")}`,
+      {
+        method: "post",
       }
     )
       .then(async (res) => await res.json())
@@ -266,7 +285,7 @@ export function B2YViewer() {
                   </p>
                 </>
               }
-              onConfirm={confirm}
+              onConfirm={confirmAll}
             >
               <Button type="primary" size="large">
                 Transfer To
@@ -366,7 +385,7 @@ export function B2YViewer() {
                         >
                           Check all
                         </Checkbox>
-                        Total {data.length} videos
+                        Total {data.length} users
                       </>
                     }
                     renderItem={(item) => (

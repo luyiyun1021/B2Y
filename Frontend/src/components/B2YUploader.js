@@ -97,12 +97,31 @@ export function B2YUploader() {
 
   const confirm = async () => {
     await fetch(
-      `http://localhost:8000/B2Y/migrate_viewer?SESSDATA=${sessionStorage.getItem(
+      `http://localhost:8000/B2Y/migrate_uploader?SESSDATA=${sessionStorage.getItem(
         "SESSDATA"
       )}&access_token=${sessionStorage.getItem("access_token")}`,
       {
         method: "post",
-        body: JSON.stringify({ videos: [1, 2, 3], sets: checkSetList }),
+        body: JSON.stringify({ videos: checkVideoList, sets: checkSetList }),
+      }
+    )
+      .then(async (res) => await res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          alert("Migration Successed!");
+        } else {
+          alert("Migration Failed!");
+        }
+      });
+  };
+
+  const confirmAll = async () => {
+    await fetch(
+      `http://localhost:8000/B2Y/migrate_uploader_all?SESSDATA=${sessionStorage.getItem(
+        "SESSDATA"
+      )}&access_token=${sessionStorage.getItem("access_token")}`,
+      {
+        method: "post",
       }
     )
       .then(async (res) => await res.json())
@@ -190,7 +209,7 @@ export function B2YUploader() {
                   </p>
                 </>
               }
-              onConfirm={confirm}
+              onConfirm={confirmAll}
             >
               <Button type="primary" size="large">
                 Transfer To
