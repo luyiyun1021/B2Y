@@ -1,0 +1,42 @@
+[
+    {
+        "model": "bili2youtube.videoidmapping",
+        "fields": {
+            "bvid": "BV1mw411F7VZ",
+            "yvid": "2LbfZhff0hk"
+        },
+        "comment": "探秘全球最危险，迪拜空中餐厅！吃牛排要签生死状？"
+    },
+    {
+        "model": "bili2youtube.videoidmapping",
+        "fields": {
+            "bvid": "BV1p8411r7rk",
+            "yvid": "Xw91ZhiUPsQ"
+        },
+        "comment": "探秘全世界最离谱的球，23亿美金！ 老美到底造了个啥？"
+    },
+    {
+        "model": "bili2youtube.videoidmapping",
+        "fields": {
+            "bvid": "BV1FB4y1f72U",
+            "yvid": "88B0DBjp9go"
+        },
+        "comment": "探秘全球最贵，巴菲特的午餐！1900万一顿饭，吃什么？"
+    },
+    {
+        "model": "bili2youtube.videoidmapping",
+        "fields": {
+            "bvid": "BV1ac411f7ek",
+            "yvid": "YY2Q4XDmZDE"
+        },
+        "comment": "一口气了解以色列经济"
+    },
+    {
+        "model": "bili2youtube.videoidmapping",
+        "fields": {
+            "bvid": "BV1L94y1t7Yb",
+            "yvid": "WoPwVT9Nrdw"
+        },
+        "comment": "【精彩】微软收购动视暴雪 | 世纪收购战争"
+    }
+]

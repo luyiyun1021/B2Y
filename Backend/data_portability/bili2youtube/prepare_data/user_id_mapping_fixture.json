@@ -1,0 +1,114 @@
+[
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "456051163",
+            "yuid": "UC4SkShyGxDGWUoBAGyfdOrQ"
+        },
+        "comment": "Meetfood小花蕾"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "3032988",
+            "yuid": "UCXB8_VeKl5FaHryoD_BZ4MQ"
+        },
+        "comment": "密子君"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "33878413",
+            "yuid": "UC3Us-ej5xHTi23szbUDenMA"
+        },
+        "comment": "睿哥有点小食力"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "94114029",
+            "yuid": "UCtv1kOY3MEuk4T32mXG2kkg"
+        },
+        "comment": "吃货请闭眼"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "447317111",
+            "yuid": "UCCNjCOnlE0anpSqEQECmJIg"
+        },
+        "comment": "Meetfood觅食"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "253350665",
+            "yuid": "UCkM0vZ9Q2ZxxRPORzTDI7eg"
+        },
+        "comment": "大聪看电影"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "419872064",
+            "yuid": "UCBJmYv3Vf_tKcQr5_qmayXg"
+        },
+        "comment": "老饭骨"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "290526283",
+            "yuid": "UCg0m_Ah8P_MQbnn77-vYnYw"
+        },
+        "comment": "美食作家王刚R"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "429748638",
+            "yuid": "UCvaqpXOcPE6Kvvn6x-D2jYQ"
+        },
+        "comment": "餐饮研究员王刚"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "196356191",
+            "yuid": "UCBPMSrO-Ljh_jGeFX5HDmkQ"
+        },
+        "comment": "翔翔大作战"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "18202105",
+            "yuid": "UCiAuybSv94YrdXhrGECtAxQ"
+        },
+        "comment": "绵羊料理"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "1532165",
+            "yuid": "CgHXsynhD8GxbFcNlPEn-_w"
+        },
+        "comment": "papi酱"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "99157282",
+            "yuid": "UCP-3kpzMMSUek7EqStDWypA"
+        },
+        "comment": "盗月社食遇记"
+    },
+    {
+        "model": "bili2youtube.useridmapping",
+        "fields": {
+            "buid": "520819684",
+            "yuid": "UCilwQlk62k1z7aUEZPOB6yw"
+        },
+        "comment": "小Lin说"
+    }
+]
