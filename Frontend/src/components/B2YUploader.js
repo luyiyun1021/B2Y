@@ -185,7 +185,7 @@ export function B2YUploader() {
                   </p>
                 </>
               }
-              onConfirm={confirm}
+              onConfirm={confirmAll}
             >
               <Button type="dashed" danger size="large">
                 Transfer All
@@ -209,7 +209,7 @@ export function B2YUploader() {
                   </p>
                 </>
               }
-              onConfirm={confirmAll}
+              onConfirm={confirm}
             >
               <Button type="primary" size="large">
                 Transfer To

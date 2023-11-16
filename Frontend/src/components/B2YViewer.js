@@ -260,7 +260,7 @@ export function B2YViewer() {
                   </p>
                 </>
               }
-              onConfirm={confirm}
+              onConfirm={confirmAll}
             >
               <Button type="dashed" danger size="large">
                 Transfer All
@@ -285,7 +285,7 @@ export function B2YViewer() {
                   </p>
                 </>
               }
-              onConfirm={confirmAll}
+              onConfirm={confirm}
             >
               <Button type="primary" size="large">
                 Transfer To
@@ -397,8 +397,8 @@ export function B2YViewer() {
                               e.target.checked
                                 ? setCheckFollowList((arr) => [...arr, item.id])
                                 : setCheckFollowList((arr) =>
-                                  arr.filter((i) => i !== item.id)
-                                )
+                                    arr.filter((i) => i !== item.id)
+                                  )
                             }
                           >
                             Check
