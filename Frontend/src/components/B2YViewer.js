@@ -220,9 +220,9 @@ export function B2YViewer() {
           <Col span={8} style={{ textAlign: "center" }}>
             <Avatar
               size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
-              src="images/bilibili.png"
+              src={data.user_profile}
             />
-            <p>{biliName}</p>
+            <p>{data.user_name}</p>
           </Col>
           <Col span={8} style={{ textAlign: "center", marginTop: "3rem" }}>
             <Popconfirm
