@@ -9,6 +9,6 @@
 2. go to `localhost:8000/admin` to view what is in your database
 3. if you want to clear database, run `python manage.py clear`
 4. edit your mapping in `bili2youtube/prepare_data/user_id_mapping_fixture.json` and `bili2youtube/prepare_data/video_id_mapping_fixture.json`
-
+5. to clear your youtube account for testing, run `python bili2youtube/youtube_utils.py`
 
 

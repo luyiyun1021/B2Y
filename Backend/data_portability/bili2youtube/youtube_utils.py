@@ -74,15 +74,34 @@ class VideoInfo:
         self.id = id
 
     def __repr__(self):
-        d = "{" + "\n" + f" 'filename': {self.filename}," +"\n" + f" 'title': {self.title},"  +"\n" + f" 'platform': {self.platform}," +"\n" + f" 'id': {self.id}," +"\n" + f" 'description': {self.description}," +"\n"+ f" 'tags': {self.tags}," +"\n" + f" 'privacyStatus': {self.privacyStatus}," +"\n"+ "}"
+        d = (
+            "{"
+            + "\n"
+            + f" 'filename': {self.filename},"
+            + "\n"
+            + f" 'title': {self.title},"
+            + "\n"
+            + f" 'platform': {self.platform},"
+            + "\n"
+            + f" 'id': {self.id},"
+            + "\n"
+            + f" 'description': {self.description},"
+            + "\n"
+            + f" 'tags': {self.tags},"
+            + "\n"
+            + f" 'privacyStatus': {self.privacyStatus},"
+            + "\n"
+            + "}"
+        )
         return d
+
 
 class PlaylistInfo:
     def __init__(
         self,
         title: str,
         description: str = "",
-        tags: list[str] = [],  #B站没有
+        tags: list[str] = [],  # B站没有
         defaultLanguage="en",
         privacyStatus: str = "private",
         platform: Platform = Platform.DEFAULT,
@@ -95,9 +114,29 @@ class PlaylistInfo:
         self.privacyStatus = privacyStatus
         self.platform = platform
         self.videoList = videoList
+
     def __repr__(self):
-        d = "{" + "\n" + f" 'title': {self.title}," +"\n" + f" 'description': {self.description},"  +"\n" + f" 'tags': {self.tags}," +"\n" + f" 'defaultLanguage': {self.defaultLanguage}," +"\n" + f" 'privacyStatus': {self.privacyStatus}," +"\n"+ f" 'platform': {self.platform}," +"\n" + f" 'videoList': {self.videoList}," +"\n"+ "}"
+        d = (
+            "{"
+            + "\n"
+            + f" 'title': {self.title},"
+            + "\n"
+            + f" 'description': {self.description},"
+            + "\n"
+            + f" 'tags': {self.tags},"
+            + "\n"
+            + f" 'defaultLanguage': {self.defaultLanguage},"
+            + "\n"
+            + f" 'privacyStatus': {self.privacyStatus},"
+            + "\n"
+            + f" 'platform': {self.platform},"
+            + "\n"
+            + f" 'videoList': {self.videoList},"
+            + "\n"
+            + "}"
+        )
         return d
+
 
 def create_new_youtube_playlist(
     client: Client,
@@ -253,8 +292,43 @@ def upload_videos(client: Client, video_info_list: list[VideoInfo]):
         return ret
 
 
+def delete_video(client: Client, video_id: str):
+    try:
+        ret = client.videos.delete(
+            video_id=video_id,
+        )
+        print(f'Video "{video_id}" deleted successfully.')
+        return ret
+    except Exception as e:
+        print(e)
+        return None
+
+
 def get_channel_id(client: Client) -> str:
     channel_info = client.channels.list(mine=True, parts=["snippet"], return_json=True)
     channel_id = channel_info["items"][0]["id"]
     print(f"Channel ID: {channel_id}")
     return channel_id
+
+
+def clear_account(client: Client):
+    try:
+        video_id_list = get_video_ids_in_channel(client)
+        for video_id in video_id_list:
+            delete_video(client, video_id)
+        playlist_id_list = get_playlist_id_list(client)
+        for playlist_id in playlist_id_list:
+            delete_playlist(client, playlist_id)
+        subscription_id_list = get_subscription_id_list(client)
+        for subscription_id in subscription_id_list:
+            unsubscribe_youtube_channel(client, subscription_id)
+        print(f"Account cleared successfully.")
+    except Exception as e:
+        print(e)
+        return None
+
+
+if __name__ == "__main__":
+    ACCESS_TOKEN = ""
+    client = Client(access_token=ACCESS_TOKEN)
+    clear_account(client)
