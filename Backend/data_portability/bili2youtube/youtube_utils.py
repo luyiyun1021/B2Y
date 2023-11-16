@@ -311,6 +311,16 @@ def get_channel_id(client: Client) -> str:
     return channel_id
 
 
+def get_channel_thumbnail(client: Client):
+    channel_info = client.channels.list(mine=True, parts=["snippet"], return_json=True)
+    return channel_info["items"][0]["snippet"]["thumbnails"]["default"]["url"]
+
+
+def get_channel_name(client: Client):
+    channel_info = client.channels.list(mine=True, parts=["snippet"], return_json=True)
+    return channel_info["items"][0]["snippet"]["title"]
+
+
 def clear_account(client: Client):
     try:
         video_id_list = get_video_ids_in_channel(client)

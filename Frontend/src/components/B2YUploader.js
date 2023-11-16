@@ -161,9 +161,9 @@ export function B2YUploader() {
           <Col span={8} style={{ textAlign: "center" }}>
             <Avatar
               size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
-              src={data.user_profile}
+              src={data.b_user_profile}
             />
-            <p>{data.user_name}</p>
+            <p>{data.b_user_name}</p>
           </Col>
           <Col span={8} style={{ textAlign: "center", marginTop: "3rem" }}>
             <Popconfirm
@@ -219,9 +219,9 @@ export function B2YUploader() {
           <Col span={8} style={{ textAlign: "center" }}>
             <Avatar
               size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 100 }}
-              src="images/youtube.png"
+              src={data.y_user_profile}
             />
-            <p>{youtubeName}</p>
+            <p>{data.y_user_name}</p>
           </Col>
         </Row>
 
