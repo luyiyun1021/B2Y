@@ -11,10 +11,10 @@ export function VideoList(props) {
   const onCheckAllChange = (e) => {
     data.forEach((t) => {
       if (e.target.checked) {
-        if (!checkVideoList.includes(t.id))
+        if (!checkVideoList.includes(t.id) && t.disable === false)
           setCheckVideoList((arr) => [...arr, t.id]);
       } else {
-        if (checkVideoList.includes(t.id))
+        if (checkVideoList.includes(t.id) && t.disable === false)
           setCheckVideoList((arr) => arr.filter((i) => i !== t.id));
       }
     });
@@ -39,7 +39,7 @@ export function VideoList(props) {
           <Checkbox onChange={onCheckAllChange} checked={checkAllVideo}>
             Check all
           </Checkbox>
-          Total {data.length} videos
+          Total {data.filter((e) => e.disable === false).length} videos
         </>
       }
       renderItem={(item) => (
@@ -74,7 +74,8 @@ export function VideoList(props) {
                         arr.filter((i) => i !== item.id)
                       )
                 }
-                checked={checkVideoList.includes(item.id)}
+                checked={checkVideoList.includes(item.id) || item.checked}
+                disabled={item.disable}
               >
                 check
               </Checkbox>

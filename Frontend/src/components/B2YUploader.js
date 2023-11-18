@@ -6,9 +6,6 @@ import { VideoList } from "./VideoList";
 import { SetList } from "./SetList";
 import { RollbackOutlined } from "@ant-design/icons";
 
-let youtubeName = "Bob";
-let biliName = "Alice";
-
 // let data = {
 //   videos: [
 //     {
@@ -26,8 +23,8 @@ let biliName = "Alice";
 //       star: 0,
 //       share: 0,
 //       comment: 1,
-//       disable: false,
-//       checked: false,
+//       disable: true,
+//       checked: true,
 //     },
 //     {
 //       id: "BV1y8411C7Mw",

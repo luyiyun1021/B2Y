@@ -16,9 +16,6 @@ import { VideoList } from "./VideoList";
 import { SetList } from "./SetList";
 import { RollbackOutlined } from "@ant-design/icons";
 
-let youtubeName = "Bob";
-let biliName = "Alice";
-
 // let data = {
 //   videos: [
 //     {
@@ -36,7 +33,7 @@ let biliName = "Alice";
 //       star: 0,
 //       share: 0,
 //       comment: 1,
-//       disable: false,
+//       disable: true,
 //       checked: false,
 //     },
 //     {
@@ -91,7 +88,7 @@ let biliName = "Alice";
 //       star: 0,
 //       share: 0,
 //       comment: 1,
-//       disable: false,
+//       disable: true,
 //       checked: false,
 //     },
 //     {
@@ -115,7 +112,7 @@ let biliName = "Alice";
 //   ],
 //   follow: [
 //     { id: "1", name: "xxx", img: "img", disable: false, checked: false },
-//     { id: "2", name: "yyy", img: "img", disable: false, checked: false },
+//     { id: "2", name: "yyy", img: "img", disable: true, checked: true },
 //     { id: "3", name: "zzz", img: "img", disable: false, checked: false },
 //   ],
 // };
@@ -369,11 +366,20 @@ export function B2YViewer() {
                         <Checkbox
                           onChange={(e) => {
                             data.follow.forEach((t) => {
-                              let ele = document.getElementById(t.id);
                               if (e.target.checked) {
-                                if (!ele.checked) ele.click();
+                                if (
+                                  !checkFollowList.includes(t.id) &&
+                                  t.disable === false
+                                )
+                                  setCheckFollowList((arr) => [...arr, t.id]);
                               } else {
-                                if (ele.checked) ele.click();
+                                if (
+                                  checkFollowList.includes(t.id) &&
+                                  t.disable === false
+                                )
+                                  setCheckFollowList((arr) =>
+                                    arr.filter((i) => i !== t.id)
+                                  );
                               }
                             });
                           }}
@@ -385,7 +391,9 @@ export function B2YViewer() {
                         >
                           Check all
                         </Checkbox>
-                        Total {data.length} users
+                        Total{" "}
+                        {data.follow.filter((e) => e.disable === false).length}{" "}
+                        users
                       </>
                     }
                     renderItem={(item) => (
@@ -397,8 +405,12 @@ export function B2YViewer() {
                               e.target.checked
                                 ? setCheckFollowList((arr) => [...arr, item.id])
                                 : setCheckFollowList((arr) =>
-                                  arr.filter((i) => i !== item.id)
-                                )
+                                    arr.filter((i) => i !== item.id)
+                                  )
+                            }
+                            disabled={item.disable}
+                            checked={
+                              item.checked || checkFollowList.includes(item.id)
                             }
                           >
                             Check
