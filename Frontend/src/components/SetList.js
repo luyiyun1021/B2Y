@@ -9,22 +9,29 @@ export function SetList(props) {
   const [checkVideoList, setCheckVideoList] = useState([]);
   const checkAllVideo =
     checkVideoList.length !== 0 &&
-    checkedVideo.filter(
-      (e) => data.video_ids.includes(e.id) && e.disable === false
-    );
+    totalV.filter(
+      (e) =>
+        data.video_ids.includes(e.id) &&
+        ((e.disable === false && checkedVideo.includes(e.id)) ||
+          e.checked === true)
+    ).length === checkVideoList.length;
   const onCheckAllChange = (e) => {
     data.video_ids.forEach((t) => {
       if (e.target.checked) {
         if (
           !checkVideoList.includes(t) &&
-          checkedVideo.includes(t) &&
-          totalV.filter((e) => e.id === t && e.disable === false).length !== 0
+          // checkedVideo.includes(t) &&
+          totalV.filter(
+            (e) => e.id === t && (e.disable === false || e.checked === true)
+          ).length !== 0
         )
           setCheckVideoList((arr) => [...arr, t]);
       } else {
         if (
           checkVideoList.includes(t) &&
-          totalV.filter((e) => e.id === t && e.disable === false).length !== 0
+          totalV.filter(
+            (e) => e.id === t && (e.disable === false || e.checked === true)
+          ).length !== 0
         )
           setCheckVideoList((arr) => arr.filter((i) => i !== t));
       }
@@ -61,7 +68,9 @@ export function SetList(props) {
           Total{" "}
           {
             totalV.filter(
-              (e) => data.video_ids.includes(e.id) && e.disable === false
+              (e) =>
+                data.video_ids.includes(e.id) &&
+                (e.disable === false || e.checked === true)
             ).length
           }{" "}
           videos
@@ -92,7 +101,11 @@ export function SetList(props) {
               <img width={250} src={item.img} alt="alt" /> <br></br>
               <Checkbox
                 style={{ marginLeft: "180px" }}
-                disabled={!checkedVideo.includes(item.id) || item.disable}
+                disabled={
+                  item.checked
+                    ? false
+                    : !checkedVideo.includes(item.id) || item.disable
+                }
                 onChange={(e) => {
                   e.target.checked
                     ? setCheckVideoList((arr) => [...arr, item.id])
