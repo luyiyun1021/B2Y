@@ -1,95 +1,95 @@
 import "../styles/App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Collapse, Avatar, Button, Popconfirm, Col, Row, Spin } from "antd";
 import { VideoList } from "./VideoList";
 import { SetList } from "./SetList";
 import { RollbackOutlined } from "@ant-design/icons";
 
-// let data = {
-//   videos: [
-//     {
-//       id: "BV1LC4y1Z7Li",
-//       bvid: "BV1LC4y1Z7Li",
-//       aid: 789284286,
-//       cid: 1291466320,
-//       title: "Foggy Brown",
-//       desc: "Bronw University Main Green on a foggy data",
-//       img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
-//       owner_mid: 1794123514,
-//       owner_name: "robertmin96",
-//       view: 6,
-//       like: 0,
-//       star: 0,
-//       share: 0,
-//       comment: 1,
-//       disable: true,
-//       checked: true,
-//     },
-//     {
-//       id: "BV1y8411C7Mw",
-//       bvid: "BV1y8411C7Mw",
-//       aid: 234207717,
-//       cid: 1285040206,
-//       title: "Tennis Practice",
-//       desc: "I played tennis with friend in summer 2023",
-//       img: "http://i0.hdslb.com/bfs/archive/917f7d98f73cb7af240dacc6bdfe160ff60c1c31.jpg",
-//       owner_mid: 1794123514,
-//       owner_name: "robertmin96",
-//       view: 7,
-//       like: 0,
-//       star: 0,
-//       share: 1,
-//       comment: 0,
-//       disable: false,
-//       checked: false,
-//     },
-//   ],
-//   sets: [
-//     {
-//       id: 3737408,
-//       title: "list3",
-//       video_ids: ["BV1LC4y1Z7Li"],
-//     },
-//     {
-//       id: 3737407,
-//       title: "list2",
-//       video_ids: ["BV1y8411C7Mw"],
-//     },
-//     {
-//       id: 3670927,
-//       title: "list1",
-//       video_ids: ["BV1LC4y1Z7Li", "BV1y8411C7Mw"],
-//     },
-//   ],
-// };
+let data = {
+  videos: [
+    {
+      id: "BV1LC4y1Z7Li",
+      bvid: "BV1LC4y1Z7Li",
+      aid: 789284286,
+      cid: 1291466320,
+      title: "Foggy Brown",
+      desc: "Bronw University Main Green on a foggy data",
+      img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
+      owner_mid: 1794123514,
+      owner_name: "robertmin96",
+      view: 6,
+      like: 0,
+      star: 0,
+      share: 0,
+      comment: 1,
+      disable: true,
+      checked: true,
+    },
+    {
+      id: "BV1y8411C7Mw",
+      bvid: "BV1y8411C7Mw",
+      aid: 234207717,
+      cid: 1285040206,
+      title: "Tennis Practice",
+      desc: "I played tennis with friend in summer 2023",
+      img: "http://i0.hdslb.com/bfs/archive/917f7d98f73cb7af240dacc6bdfe160ff60c1c31.jpg",
+      owner_mid: 1794123514,
+      owner_name: "robertmin96",
+      view: 7,
+      like: 0,
+      star: 0,
+      share: 1,
+      comment: 0,
+      disable: false,
+      checked: false,
+    },
+  ],
+  sets: [
+    {
+      id: 3737408,
+      title: "list3",
+      video_ids: ["BV1LC4y1Z7Li"],
+    },
+    {
+      id: 3737407,
+      title: "list2",
+      video_ids: ["BV1y8411C7Mw"],
+    },
+    {
+      id: 3670927,
+      title: "list1",
+      video_ids: ["BV1LC4y1Z7Li", "BV1y8411C7Mw"],
+    },
+  ],
+};
 
 export function B2YUploader() {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetch(
-        `http://localhost:8000/B2Y/uploader?SESSDATA=${sessionStorage.getItem(
-          "SESSDATA"
-        )}&access_token=${sessionStorage.getItem("access_token")}`,
-        { method: "get" }
-      )
-        .then(async (res) => await res.json())
-        .then((json) => {
-          let data = json.data;
-          if (data.videos === null) data.videos = [];
-          if (data.sets === null) data.sets = [];
-          setData(data);
-          setCheckSetList(Array(data.sets.length).fill([]));
-        });
-    };
-    fetchData();
-  }, []);
+  // const [data, setData] = useState(null);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     await fetch(
+  //       `http://localhost:8000/B2Y/uploader?SESSDATA=${sessionStorage.getItem(
+  //         "SESSDATA"
+  //       )}&access_token=${sessionStorage.getItem("access_token")}`,
+  //       { method: "get" }
+  //     )
+  //       .then(async (res) => await res.json())
+  //       .then((json) => {
+  //         let data = json.data;
+  //         if (data.videos === null) data.videos = [];
+  //         if (data.sets === null) data.sets = [];
+  //         setData(data);
+  //         setCheckSetList(Array(data.sets.length).fill([]));
+  //       });
+  //   };
+  //   fetchData();
+  // }, []);
 
   const [checkVideoList, setCheckVideoList] = useState([]);
   const [checkSetList, setCheckSetList] = useState(
-    // Array(data.sets.length).fill([])
-    []
+    Array(data.sets.length).fill([])
+    // []
   );
 
   const confirm = async () => {
@@ -118,10 +118,52 @@ export function B2YUploader() {
       });
   };
 
+  const confirmAll = async () => {
+    let vid = [];
+    data.videos.forEach((e) => {
+      if (e.disable === false) vid.push(e.id);
+    });
+    let tmp = [];
+    data.sets.forEach((e, i) => {
+      let arr = [];
+      data.videos.forEach((t) => {
+        if (e.video_ids.includes(t.id)) {
+          if (t.disable === false || t.checked === true) {
+            arr.push(t.id);
+          }
+        }
+      });
+      tmp.push(arr);
+    });
+    await fetch(
+      `http://localhost:8000/B2Y/migrate_uploader?SESSDATA=${sessionStorage.getItem(
+        "SESSDATA"
+      )}&access_token=${sessionStorage.getItem("access_token")}`,
+      {
+        method: "post",
+        body: JSON.stringify({
+          videos: vid,
+          sets: tmp.map((e, i) => ({
+            setid: data.sets[i].id,
+            videos: e,
+          })),
+        }),
+      }
+    )
+      .then(async (res) => await res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          alert("Migration Successed!");
+        } else {
+          alert("Migration Failed!");
+        }
+      });
+  };
+
   if (
-    sessionStorage.getItem("SESSDATA") == null ||
-    sessionStorage.getItem("access_token") == null
-    // false
+    // sessionStorage.getItem("SESSDATA") == null ||
+    // sessionStorage.getItem("access_token") == null
+    false
   ) {
     return <Navigate replace to="/login" />;
   } else {
@@ -169,7 +211,7 @@ export function B2YUploader() {
                   </p>
                 </>
               }
-              onConfirm={confirm}
+              onConfirm={confirmAll}
             >
               <Button type="dashed" danger size="large">
                 Transfer All
@@ -249,6 +291,7 @@ export function B2YUploader() {
                             setCheckSet={setCheckSetList}
                             idx={i}
                             checkedVideo={checkVideoList}
+                            type={"uploader"}
                           ></SetList>
                         ),
                       },

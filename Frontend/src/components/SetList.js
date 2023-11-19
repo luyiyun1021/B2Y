@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { List, Space, Checkbox } from "antd";
 
 export function SetList(props) {
-  const { totalV, data, setCheckSet, idx, checkedVideo } = props;
+  const { totalV, data, setCheckSet, idx, checkedVideo, type } = props;
   const [checkVideoList, setCheckVideoList] = useState([]);
   const checkAllVideo =
     checkVideoList.length !== 0 &&
@@ -20,10 +20,13 @@ export function SetList(props) {
       if (e.target.checked) {
         if (
           !checkVideoList.includes(t) &&
-          // checkedVideo.includes(t) &&
-          totalV.filter(
-            (e) => e.id === t && (e.disable === false || e.checked === true)
-          ).length !== 0
+          (type === "viewer"
+            ? totalV.filter(
+                (e) => e.id === t && (e.disable === false || e.checked === true)
+              ).length !== 0
+            : checkedVideo.includes(t) ||
+              totalV.filter((e) => e.id === t && e.checked === true).length !==
+                0)
         )
           setCheckVideoList((arr) => [...arr, t]);
       } else {
@@ -51,6 +54,22 @@ export function SetList(props) {
       return tmp;
     });
   }, [checkVideoList, idx, setCheckSet]);
+
+  useEffect(() => {
+    if (checkVideoList.length !== 0) {
+      setCheckVideoList((arr) => {
+        let t = arr.filter((e) =>
+          type === "viewer"
+            ? checkedVideo.includes(e)
+            : checkedVideo.includes(e) ||
+              totalV.filter((t) => t.id === e && t.checked === true).length ===
+                1
+        );
+        if (t.length === 0) return [];
+        else return t;
+      });
+    }
+  }, [checkVideoList, checkedVideo, totalV, type]);
 
   return (
     <List

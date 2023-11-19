@@ -16,133 +16,133 @@ import { VideoList } from "./VideoList";
 import { SetList } from "./SetList";
 import { RollbackOutlined } from "@ant-design/icons";
 
-// let data = {
-//   videos: [
-//     {
-//       id: "BV1LC4y1Z7Li",
-//       bvid: "BV1LC4y1Z7Li",
-//       aid: 789284286,
-//       cid: 1291466320,
-//       title: "Foggy Brown",
-//       desc: "Bronw University Main Green on a foggy data",
-//       img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
-//       owner_mid: 1794123514,
-//       owner_name: "robertmin96",
-//       view: 6,
-//       like: 0,
-//       star: 0,
-//       share: 0,
-//       comment: 1,
-//       disable: true,
-//       checked: false,
-//     },
-//     {
-//       id: "BV1y8411C7Mw",
-//       bvid: "BV1y8411C7Mw",
-//       aid: 234207717,
-//       cid: 1285040206,
-//       title: "Tennis Practice",
-//       desc: "I played tennis with friend in summer 2023",
-//       img: "http://i0.hdslb.com/bfs/archive/917f7d98f73cb7af240dacc6bdfe160ff60c1c31.jpg",
-//       owner_mid: 1794123514,
-//       owner_name: "robertmin96",
-//       view: 7,
-//       like: 0,
-//       star: 0,
-//       share: 1,
-//       comment: 0,
-//       disable: false,
-//       checked: false,
-//     },
-//   ],
-//   sets: [
-//     {
-//       id: 3737408,
-//       title: "list3",
-//       video_ids: ["BV1LC4y1Z7Li"],
-//     },
-//     {
-//       id: 3737407,
-//       title: "list2",
-//       video_ids: ["BV1y8411C7Mw"],
-//     },
-//     {
-//       id: 3670927,
-//       title: "list1",
-//       video_ids: ["BV1LC4y1Z7Li", "BV1y8411C7Mw"],
-//     },
-//   ],
-//   likes: [
-//     {
-//       id: "BV1LC4y1Z7Li",
-//       bvid: "BV1LC4y1Z7Li",
-//       aid: 789284286,
-//       cid: 1291466320,
-//       title: "Foggy Brown",
-//       desc: "Bronw University Main Green on a foggy data",
-//       img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
-//       owner_mid: 1794123514,
-//       owner_name: "robertmin96",
-//       view: 6,
-//       like: 0,
-//       star: 0,
-//       share: 0,
-//       comment: 1,
-//       disable: true,
-//       checked: false,
-//     },
-//     {
-//       id: "BV1y8411C7Mw",
-//       bvid: "BV1y8411C7Mw",
-//       aid: 234207717,
-//       cid: 1285040206,
-//       title: "Tennis Practice",
-//       desc: "I played tennis with friend in summer 2023",
-//       img: "http://i0.hdslb.com/bfs/archive/917f7d98f73cb7af240dacc6bdfe160ff60c1c31.jpg",
-//       owner_mid: 1794123514,
-//       owner_name: "robertmin96",
-//       view: 7,
-//       like: 0,
-//       star: 0,
-//       share: 1,
-//       comment: 0,
-//       disable: false,
-//       checked: false,
-//     },
-//   ],
-//   follow: [
-//     { id: "1", name: "xxx", img: "img", disable: false, checked: false },
-//     { id: "2", name: "yyy", img: "img", disable: true, checked: true },
-//     { id: "3", name: "zzz", img: "img", disable: false, checked: false },
-//   ],
-// };
+let data = {
+  videos: [
+    {
+      id: "BV1LC4y1Z7Li",
+      bvid: "BV1LC4y1Z7Li",
+      aid: 789284286,
+      cid: 1291466320,
+      title: "Foggy Brown",
+      desc: "Bronw University Main Green on a foggy data",
+      img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
+      owner_mid: 1794123514,
+      owner_name: "robertmin96",
+      view: 6,
+      like: 0,
+      star: 0,
+      share: 0,
+      comment: 1,
+      disable: true,
+      checked: false,
+    },
+    {
+      id: "BV1y8411C7Mw",
+      bvid: "BV1y8411C7Mw",
+      aid: 234207717,
+      cid: 1285040206,
+      title: "Tennis Practice",
+      desc: "I played tennis with friend in summer 2023",
+      img: "http://i0.hdslb.com/bfs/archive/917f7d98f73cb7af240dacc6bdfe160ff60c1c31.jpg",
+      owner_mid: 1794123514,
+      owner_name: "robertmin96",
+      view: 7,
+      like: 0,
+      star: 0,
+      share: 1,
+      comment: 0,
+      disable: false,
+      checked: false,
+    },
+  ],
+  sets: [
+    {
+      id: 3737408,
+      title: "list3",
+      video_ids: ["BV1LC4y1Z7Li"],
+    },
+    {
+      id: 3737407,
+      title: "list2",
+      video_ids: ["BV1y8411C7Mw"],
+    },
+    {
+      id: 3670927,
+      title: "list1",
+      video_ids: ["BV1LC4y1Z7Li", "BV1y8411C7Mw"],
+    },
+  ],
+  likes: [
+    {
+      id: "BV1LC4y1Z7Li",
+      bvid: "BV1LC4y1Z7Li",
+      aid: 789284286,
+      cid: 1291466320,
+      title: "Foggy Brown",
+      desc: "Bronw University Main Green on a foggy data",
+      img: "http://i2.hdslb.com/bfs/archive/4632e780d3411dccd8fd6758e7d39968449cebf5.jpg",
+      owner_mid: 1794123514,
+      owner_name: "robertmin96",
+      view: 6,
+      like: 0,
+      star: 0,
+      share: 0,
+      comment: 1,
+      disable: true,
+      checked: false,
+    },
+    {
+      id: "BV1y8411C7Mw",
+      bvid: "BV1y8411C7Mw",
+      aid: 234207717,
+      cid: 1285040206,
+      title: "Tennis Practice",
+      desc: "I played tennis with friend in summer 2023",
+      img: "http://i0.hdslb.com/bfs/archive/917f7d98f73cb7af240dacc6bdfe160ff60c1c31.jpg",
+      owner_mid: 1794123514,
+      owner_name: "robertmin96",
+      view: 7,
+      like: 0,
+      star: 0,
+      share: 1,
+      comment: 0,
+      disable: false,
+      checked: false,
+    },
+  ],
+  follow: [
+    { id: "1", name: "xxx", img: "img", disable: false, checked: false },
+    { id: "2", name: "yyy", img: "img", disable: true, checked: true },
+    { id: "3", name: "zzz", img: "img", disable: false, checked: false },
+  ],
+};
 
 export function B2YViewer() {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetch(
-        `http://localhost:8000/B2Y/viewer?SESSDATA=${sessionStorage.getItem(
-          "SESSDATA"
-        )}&access_token=${sessionStorage.getItem("access_token")}`,
-        { method: "get" }
-      )
-        .then(async (res) => await res.json())
-        .then((json) => {
-          let data = json.data;
-          if (data.sets === null) data.sets = [];
-          if (data.likes === null) data.likes = [];
-          if (data.follow === null) data.follow = [];
-          setData(data);
-          setCheckSetList(Array(data.sets.length).fill([]));
-        });
-    };
-    fetchData();
-  }, []);
+  // const [data, setData] = useState(null);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     await fetch(
+  //       `http://localhost:8000/B2Y/viewer?SESSDATA=${sessionStorage.getItem(
+  //         "SESSDATA"
+  //       )}&access_token=${sessionStorage.getItem("access_token")}`,
+  //       { method: "get" }
+  //     )
+  //       .then(async (res) => await res.json())
+  //       .then((json) => {
+  //         let data = json.data;
+  //         if (data.sets === null) data.sets = [];
+  //         if (data.likes === null) data.likes = [];
+  //         if (data.follow === null) data.follow = [];
+  //         setData(data);
+  //         setCheckSetList(Array(data.sets.length).fill([]));
+  //       });
+  //   };
+  //   fetchData();
+  // }, []);
 
   const [checkSetList, setCheckSetList] = useState(
-    // Array(data.sets.length).fill([])
-    []
+    Array(data.sets.length).fill([])
+    // []
   );
   const [checkLikesList, setCheckLikesList] = useState([]);
   const [checkFollowList, setCheckFollowList] = useState([]);
@@ -174,10 +174,56 @@ export function B2YViewer() {
       });
   };
 
+  const confirmAll = async () => {
+    let tmp = [];
+    data.sets.forEach((e, i) => {
+      let arr = [];
+      data.videos.forEach((t) => {
+        if (e.video_ids.includes(t.id)) {
+          if (t.disable === false) {
+            // no check checked field
+            arr.push(t.id);
+          }
+        }
+      });
+      tmp.push(arr);
+    });
+    let likes = data.likes.filter(
+      (e) => e.disable === false && e.checked === false
+    );
+    let follow = data.follow.filter(
+      (e) => e.disable === false && e.checked === false
+    );
+    await fetch(
+      `http://localhost:8000/B2Y/migrate_viewer?SESSDATA=${sessionStorage.getItem(
+        "SESSDATA"
+      )}&access_token=${sessionStorage.getItem("access_token")}`,
+      {
+        method: "post",
+        body: JSON.stringify({
+          sets: tmp.map((e, i) => ({
+            setid: data.sets[i].id,
+            videos: e,
+          })),
+          likes: likes,
+          follow: follow,
+        }),
+      }
+    )
+      .then(async (res) => await res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          alert("Migration Successed!");
+        } else {
+          alert("Migration Failed!");
+        }
+      });
+  };
+
   if (
-    sessionStorage.getItem("SESSDATA") == null ||
-    sessionStorage.getItem("access_token") == null
-    // false
+    // sessionStorage.getItem("SESSDATA") == null ||
+    // sessionStorage.getItem("access_token") == null
+    false
   ) {
     return <Navigate replace to="/login" />;
   } else {
@@ -241,7 +287,7 @@ export function B2YViewer() {
                   </p>
                 </>
               }
-              onConfirm={confirm}
+              onConfirm={confirmAll}
             >
               <Button type="dashed" danger size="large">
                 Transfer All
@@ -305,7 +351,7 @@ export function B2YViewer() {
                             setCheckSet={setCheckSetList}
                             idx={i}
                             checkedVideo={data.videos.map((e) => e.id)}
-                            uniqueID={i + "0001"}
+                            type={"viewer"}
                           ></SetList>
                         ),
                       },
