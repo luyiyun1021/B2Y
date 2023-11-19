@@ -99,7 +99,13 @@ export function B2YUploader() {
       )}&access_token=${sessionStorage.getItem("access_token")}`,
       {
         method: "post",
-        body: JSON.stringify({ videos: checkVideoList, sets: checkSetList }),
+        body: JSON.stringify({
+          videos: checkVideoList,
+          sets: checkSetList.map((e, i) => ({
+            setid: data.sets[i].id,
+            videos: e,
+          })),
+        }),
       }
     )
       .then(async (res) => await res.json())

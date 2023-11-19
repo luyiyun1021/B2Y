@@ -155,8 +155,11 @@ export function B2YViewer() {
       {
         method: "post",
         body: JSON.stringify({
-          sets: checkSetList,
-          liks: checkLikesList,
+          sets: checkSetList.map((e, i) => ({
+            setid: data.sets[i].id,
+            videos: e,
+          })),
+          like: checkLikesList,
           follow: checkFollowList,
         }),
       }
@@ -405,8 +408,8 @@ export function B2YViewer() {
                               e.target.checked
                                 ? setCheckFollowList((arr) => [...arr, item.id])
                                 : setCheckFollowList((arr) =>
-                                      arr.filter((i) => i !== item.id)
-                                    )
+                                    arr.filter((i) => i !== item.id)
+                                  )
                             }
                             disabled={item.disable}
                             checked={
