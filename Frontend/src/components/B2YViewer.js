@@ -157,6 +157,8 @@ export function B2YViewer() {
         body: JSON.stringify({
           sets: checkSetList.map((e, i) => ({
             setid: data.sets[i].id,
+            name: data.sets[i].name,
+            desc: data.sets[i].desc,
             videos: e,
           })),
           like: checkLikesList,
