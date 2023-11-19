@@ -190,12 +190,12 @@ export function B2YViewer() {
       });
       tmp.push(arr);
     });
-    let likes = data.likes.filter(
-      (e) => e.disable === false && e.checked === false
-    );
-    let follow = data.follow.filter(
-      (e) => e.disable === false && e.checked === false
-    );
+    let likes = data.likes
+      .filter((e) => e.disable === false && e.checked === false)
+      .map((e) => e.id);
+    let follow = data.follow
+      .filter((e) => e.disable === false && e.checked === false)
+      .map((e) => e.id);
     await fetch(
       `http://localhost:8000/B2Y/migrate_viewer?SESSDATA=${sessionStorage.getItem(
         "SESSDATA"
@@ -209,7 +209,7 @@ export function B2YViewer() {
             desc: data.sets[i].desc,
             videos: e,
           })),
-          likes: likes,
+          like: likes,
           follow: follow,
         }),
       }
