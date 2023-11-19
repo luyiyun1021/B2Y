@@ -174,25 +174,6 @@ export function B2YViewer() {
       });
   };
 
-  const confirmAll = async () => {
-    await fetch(
-      `http://localhost:8000/B2Y/migrate_viewer_all?SESSDATA=${sessionStorage.getItem(
-        "SESSDATA"
-      )}&access_token=${sessionStorage.getItem("access_token")}`,
-      {
-        method: "post",
-      }
-    )
-      .then(async (res) => await res.json())
-      .then((data) => {
-        if (data.status === "success") {
-          alert("Migration Successed!");
-        } else {
-          alert("Migration Failed!");
-        }
-      });
-  };
-
   if (
     sessionStorage.getItem("SESSDATA") == null ||
     sessionStorage.getItem("access_token") == null
@@ -260,7 +241,7 @@ export function B2YViewer() {
                   </p>
                 </>
               }
-              onConfirm={confirmAll}
+              onConfirm={confirm}
             >
               <Button type="dashed" danger size="large">
                 Transfer All
