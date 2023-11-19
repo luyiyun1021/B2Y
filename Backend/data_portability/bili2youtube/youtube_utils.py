@@ -1,17 +1,28 @@
 from pyyoutube import Client
 import pyyoutube.models as mds
 from pyyoutube.media import Media
-import multiprocessing
+import concurrent.futures
 from enum import Enum
 import json
 
 
 def get_subscription_id_list(client: Client) -> list[str]:
-    sub_list = client.subscriptions.list(mine=True, parts=["snippet"], return_json=True)
+    sub_list = client.subscriptions.list(
+        mine=True, parts=["snippet"], return_json=True, max_results=50
+    )
     ret = []
     # print(json.dumps(sub_list["items"], indent=4))
     for item in sub_list["items"]:
         ret.append(item["id"])
+    print(f"Subscription ID list: {ret}")
+    return ret
+
+
+def get_subscription_channel_id_list(client: Client) -> list[str]:
+    sub_list = client.subscriptions.list(mine=True, parts=["snippet"], return_json=True)
+    ret = []
+    for item in sub_list["items"]:
+        ret.append(item["snippet"]["resourceId"]["channelId"])
     print(f"Subscription ID list: {ret}")
     return ret
 
@@ -168,7 +179,9 @@ def create_new_youtube_playlist(
 
 
 def get_playlist_id_list(client: Client) -> list[str]:
-    sub_list = client.playlists.list(mine=True, parts=["snippet"], return_json=True)
+    sub_list = client.playlists.list(
+        mine=True, parts=["snippet"], return_json=True, max_results=50
+    )
     ret = []
     for item in sub_list["items"]:
         ret.append(item["id"])
@@ -208,7 +221,7 @@ def get_video_ids_in_playlist(client: Client, playlist_id: str):
 
 def get_video_ids_in_channel(client: Client) -> list[str]:
     channel_info = client.channels.list(
-        mine=True, parts=["snippet", "contentDetails"], return_json=True
+        mine=True, parts=["snippet", "contentDetails"], return_json=True, max_results=50
     )
     channel_playlist_id = channel_info["items"][0]["contentDetails"][
         "relatedPlaylists"
@@ -253,6 +266,18 @@ def rate_video(client: Client, video_id: str, rating: str = "like"):
         return None
 
 
+def is_rated(client: Client, video_id: str):
+    try:
+        ret = client.videos.get_rating(
+            video_id=video_id,
+            return_json=True,
+        )
+        return not ret["items"][0]["rating"] == "none"
+    except Exception as e:
+        print(e)
+        return None
+
+
 def upload_video(
     client: Client,
     video_info: VideoInfo,
@@ -283,13 +308,24 @@ def upload_video(
 
 
 def upload_videos(client: Client, video_info_list: list[VideoInfo]):
-    with multiprocessing.Pool(processes=len(video_info_list)) as pool:
-        results = []
+    ret = []
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        ret_futures = []
         for video_info in video_info_list:
-            results.append(pool.apply_async(upload_video, (client, video_info)))
-        ret = [result.get() for result in results]
+            ret_futures.append(executor.submit(upload_video, client, video_info))
+        for future in ret_futures:
+            ret.append(future.result())
         print(f"Video ID list: {ret} uploaded successfully.")
         return ret
+
+
+def is_uploaded(client: Client, video_id: str):
+    try:
+        video_ids = get_video_ids_in_channel(client)
+        return video_id in video_ids
+    except Exception as e:
+        print(e)
+        return None
 
 
 def delete_video(client: Client, video_id: str):
@@ -321,6 +357,31 @@ def get_channel_name(client: Client):
     return channel_info["items"][0]["snippet"]["title"]
 
 
+def get_liked_videos(client: Client):
+    liked_videos = client.videos.list(
+        my_rating="like", parts=["snippet"], return_json=True, max_results=50
+    )
+    ret = []
+    for item in liked_videos["items"]:
+        ret.append(item["id"])
+    print(f"Video ID list: {ret} liked by me")
+    return ret
+
+
+def unrate_video(client: Client, video_id: str):
+    try:
+        ret = client.videos.rate(
+            video_id=video_id,
+            rating="none",
+            return_json=True,
+        )
+        print(f'Video "{video_id}" unrated successfully.')
+        return ret
+    except Exception as e:
+        print(e)
+        return None
+
+
 def clear_account(client: Client):
     try:
         video_id_list = get_video_ids_in_channel(client)
@@ -332,6 +393,9 @@ def clear_account(client: Client):
         subscription_id_list = get_subscription_id_list(client)
         for subscription_id in subscription_id_list:
             unsubscribe_youtube_channel(client, subscription_id)
+        liked_video_id_list = get_liked_videos(client)
+        for video_id in liked_video_id_list:
+            unrate_video(client, video_id)
         print(f"Account cleared successfully.")
     except Exception as e:
         print(e)
@@ -339,6 +403,6 @@ def clear_account(client: Client):
 
 
 if __name__ == "__main__":
-    ACCESS_TOKEN = ""
+    ACCESS_TOKEN = "ya29.a0AfB_byC_F_22imYpUfTJQBJWXmvX92CgcQDmCN3hffHcM5DoBPGFQ2-LQRuatnHx4apGyoBi_mNcxItRx0zlZzGYTP8W_605w9K0kHvsbOg82SCaRXUt--LTE1SocB5kTWRBT1Vl71BTMPj0KDHS5dpNnXZ1oKBDgUgJRhfraCgYKAYASARASFQHGX2Mi_J9ioeJmGLvhMy2WunGb1A0175"
     client = Client(access_token=ACCESS_TOKEN)
     clear_account(client)
