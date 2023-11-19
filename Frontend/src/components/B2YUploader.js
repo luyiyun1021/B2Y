@@ -103,7 +103,7 @@ export function B2YUploader() {
           videos: checkVideoList,
           sets: checkSetList.map((e, i) => ({
             setid: data.sets[i].id,
-            name: data.sets[i].name,
+            title: data.sets[i].title,
             desc: data.sets[i].desc,
             videos: e,
           })),
@@ -147,7 +147,7 @@ export function B2YUploader() {
           videos: vid,
           sets: tmp.map((e, i) => ({
             setid: data.sets[i].id,
-            name: data.sets[i].name,
+            title: data.sets[i].title,
             desc: data.sets[i].desc,
             videos: e,
           })),
