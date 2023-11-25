@@ -3,9 +3,12 @@ import math
 import subprocess
 import time
 import concurrent.futures
+import traceback
 from fake_useragent import UserAgent
 import os
 from ..youtube_utils import *
+from bili2youtube.bilibili_utils.wbi import getSignedParams
+from bili2youtube.bilibili_utils.header_gen import generate_headers
 from bili2youtube.models import VideoIDMapping, UserIDMapping
 
 # from Backend.data_portability.bili2youtube.youtube_utils import *
@@ -13,13 +16,17 @@ from bili2youtube.models import VideoIDMapping, UserIDMapping
 SESSION_ID = ""
 VIDEO_DOWNLOAD_PATH = os.path.join(os.environ["HOME"], "Downloads/")
 VIDEO_DOWNLOAD_QUALITY_ID = 32  # 清晰度参考 https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/videostream_url.md
+ENABLE_MULTI_THREAD = True
 
 
 def get_user_info(session_id=SESSION_ID):
     url = "https://api.bilibili.com/x/web-interface/nav"
     cookies = {"SESSDATA": session_id}
     try:
-        response = requests.get(url, cookies=cookies)
+        params = getSignedParams({})
+        headers = generate_headers(f"SESSDATA={session_id}")
+        response = requests.get(url, cookies=cookies, params=params, headers=headers)
+        response.raise_for_status()
         json_response = response.json()
         user = {}
         user["uname"] = json_response["data"]["uname"]
@@ -29,6 +36,7 @@ def get_user_info(session_id=SESSION_ID):
 
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
+        traceback.print_stack()
 
 
 def get_all_videos(mid):
@@ -37,19 +45,6 @@ def get_all_videos(mid):
     :param mid: user id
     :return:
     """
-
-    cookie = (
-        "buvid3=BD50D87E-E743-1743-C2A1-9A41DC86273F95198infoc; b_nut=1694354195; i-wanna-go-back=-1; b_ut=7; _uuid=23CA6788-D728-9B77-5E5F-F10D24638A18195282infoc;"
-        "home_feed_column=4; buvid4=D17D272D-3947-6103-59E9-B477F4A6F10096454-023091021-ADgaJkpv35ag3jEPdUjt5A%3D%3D; header_theme_version=CLOSE;"
-        "SESSDATA=87481b1e%2C1709943379%2C0441c%2A92CjAHfmGBZolEBjVXoxNTSolsIZoib7Jtc9i-EMWOeEhrBNhv2FlQbDNa0gn_sGGIhpoSVlNMSDBubVZKd1E4VU84Uk5WZlBETHpBRzFOekwxNG1NY3MtNkN0ZHNnVDFrUzFpWnZDNi1La2FyRFlxTktyZEVkdEJsc1ZjM1VuQ1duTzFkb1llUmtBIIEC;"
-        "bili_jct=b7a72f2b5318bc9825f355e72b7d043c; DedeUserID=210437382; DedeUserID__ckMd5=f39352f467bcdc4c; sid=5kfzrj3i; rpdid=|(J|)RYllukR0J'uYmRJmuJmu;"
-        "CURRENT_QUALITY=80; is-2022-channel=1; fingerprint=c92d21e3c77cb459556d4c284764ee0e; buvid_fp_plain=undefined; hit-new-style-dyn=1;"
-        "hit-dyn-v2=1; LIVE_BUVID=AUTO8316944407472560; bsource=search_baidu; browser_resolution=1373-670; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9."
-        "eyJleHAiOjE2OTU0NDkwOTYsImlhdCI6MTY5NTE4OTg5NiwicGx0IjotMX0.kezcVsJdP_jTH8IHoi3Cz_r9suiWvZfj3SpA1L2zv70; bili_ticket_expires=1695449096; PVID=1;"
-        "CURRENT_BLACKGAP=0; CURRENT_FNVAL=4048; bp_video_offset_210437382=844202489484935223; buvid_fp=c92d21e3c77cb459556d4c284764ee0e; b_lsid=9F13B10610_18ABF3F3F36"
-    )
-
-    ua = UserAgent()
     # agent_set = set()
     # first_agent = ua.random
     # agent_set.add(first_agent)
@@ -63,17 +58,10 @@ def get_all_videos(mid):
     #     "User-Agent": ua.random,
     # }
 
-    headers = {
-        "User-Agent": ua.random,
-        "Accept-Language": "en-US,en;q=0.5",
-        "Referer": "https://www.bilibili.com/",
-        "Cookie": cookie,  # 添加 Cookie
-    }
-
     # time.sleep(2)
 
     try:
-        response = requests.get(base_url, headers=headers)
+        response = requests.get(base_url, headers=generate_headers())
         json_response = response.json()
 
         # print(json_response)
@@ -101,14 +89,7 @@ def get_all_videos(mid):
             #     "User-Agent": ua.random,
             # }
 
-            headers = {
-                "User-Agent": ua.random,
-                "Accept-Language": "en-US,en;q=0.5",
-                "Referer": "https://www.bilibili.com/",
-                "Cookie": cookie,  # 添加 Cookie
-            }
-
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=generate_headers())
             json_response = response.json()
             video_list = json_response["data"]["list"]["vlist"]
             for v in video_list:
@@ -141,7 +122,8 @@ def get_series_lists(mid):
     """
     base_url = f"https://api.bilibili.com/x/polymer/web-space/seasons_series_list?mid={mid}&page_num=1&page_size=20"
     try:
-        response = requests.get(base_url)
+        headers = generate_headers()
+        response = requests.get(base_url, headers=headers)
         json_response = response.json()
 
         total_videos = json_response["data"]["items_lists"]["page"]["total"]
@@ -150,39 +132,40 @@ def get_series_lists(mid):
 
         # print("total_pages", total_pages)
         res = []
-        response_futures = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        if ENABLE_MULTI_THREAD:
+            response_futures = []
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for page in range(1, total_pages + 1):
+                    url = f"https://api.bilibili.com/x/polymer/web-space/seasons_series_list?mid={mid}&page_num={page}&page_size={page_size}"
+                    future = executor.submit(requests.get, url, headers=headers)
+                    response_futures.append(future)
+
+            for response_future in response_futures:
+                response = response_future.result()
+                json_response = response.json()
+                series_list = json_response["data"]["items_lists"]["series_list"]
+                for item in series_list:
+                    res.append(
+                        {
+                            "series_id": item["meta"]["series_id"],
+                            "name": item["meta"]["name"],
+                            "description": item["meta"]["description"],
+                        }
+                    )
+        else:  # single thread
             for page in range(1, total_pages + 1):
                 url = f"https://api.bilibili.com/x/polymer/web-space/seasons_series_list?mid={mid}&page_num={page}&page_size={page_size}"
-                future = executor.submit(requests.get, url)
-                response_futures.append(future)
-
-        for response_future in response_futures:
-            response = response_future.result()
-            json_response = response.json()
-            series_list = json_response["data"]["items_lists"]["series_list"]
-            for item in series_list:
-                res.append(
-                    {
-                        "series_id": item["meta"]["series_id"],
-                        "name": item["meta"]["name"],
-                        "description": item["meta"]["description"],
-                    }
-                )
-
-        # for page in range(1, total_pages + 1):
-        #     url = f"https://api.bilibili.com/x/polymer/web-space/seasons_series_list?mid={mid}&page_num={page}&page_size={page_size}"
-        #     response = requests.get(url)
-        #     json_response = response.json()
-        #     series_list = json_response["data"]["items_lists"]["series_list"]
-        #     for item in series_list:
-        #         res.append(
-        #             {
-        #                 "series_id": item["meta"]["series_id"],
-        #                 "name": item["meta"]["name"],
-        #                 "description": item["meta"]["description"],
-        #             }
-        #         )
+                response = requests.get(url, headers=headers)
+                json_response = response.json()
+                series_list = json_response["data"]["items_lists"]["series_list"]
+                for item in series_list:
+                    res.append(
+                        {
+                            "series_id": item["meta"]["series_id"],
+                            "name": item["meta"]["name"],
+                            "description": item["meta"]["description"],
+                        }
+                    )
         return res
 
     except Exception as error:
@@ -228,12 +211,15 @@ def get_video_info(bvid):
     :return:
     """
     url = "https://api.bilibili.com/x/web-interface/view"
-    params = {"bvid": bvid}
+    # params = {"bvid": bvid}
     try:
-        response = requests.get(url, params=params)
+        params = {"bvid": bvid}
+        response = requests.get(url, params=params, headers=generate_headers())
+        response.raise_for_status()
         json_response = response.json()
         # video = {'bvid': bvid}
         data = json_response["data"]
+        # print(json.dumps(json_response, indent=4, sort_keys=True))
         video = {
             "id": bvid,
             "bvid": bvid,
@@ -256,6 +242,7 @@ def get_video_info(bvid):
 
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
+        traceback.print_stack()
 
 
 def get_video_tags(bvid, session_id=SESSION_ID):
@@ -328,40 +315,42 @@ def get_all_videos_with_detailed_info(mid, youtube_client):
     try:
         all_video_id_list = get_all_videos(mid)
         res = []
-        video_info_futures = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            for v in all_video_id_list:
-                future = executor.submit(get_video_info, v["bvid"])
-                video_info_futures.append(future)
-        for future in concurrent.futures.as_completed(video_info_futures):
-            video_info = future.result()
-            not_exist = not VideoIDMapping.objects.filter(
-                bvid=video_info["bvid"]
-            ).exists()
-            checked = (
-                is_uploaded(
-                    youtube_client,
-                    VideoIDMapping.objects.get(bvid=video_info["bvid"]).yvid,
+        if ENABLE_MULTI_THREAD:
+            video_info_futures = []
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for v in all_video_id_list:
+                    future = executor.submit(get_video_info, v["bvid"])
+                    video_info_futures.append(future)
+            for future in concurrent.futures.as_completed(video_info_futures):
+                video_info = future.result()
+                not_exist = not VideoIDMapping.objects.filter(
+                    bvid=video_info["bvid"]
+                ).exists()
+                checked = (
+                    is_uploaded(
+                        youtube_client,
+                        VideoIDMapping.objects.get(bvid=video_info["bvid"]).yvid,
+                    )
+                    if not not_exist
+                    else False
                 )
-                if not not_exist
-                else False
-            )
-            video_info["checked"] = checked
-            video_info["disable"] = checked
-            res.append(video_info)
-        # for v in all_video_id_list:
-        #     video_info = get_video_info(v["bvid"])
-        #     not_exist = not VideoIDMapping.objects.filter(bvid=v["bvid"]).exists()
-        #     checked = (
-        #         is_uploaded(
-        #             youtube_client, VideoIDMapping.objects.get(bvid=v["bvid"]).yvid
-        #         )
-        #         if not not_exist
-        #         else False
-        #     )
-        #     video_info["checked"] = checked
-        #     video_info["disable"] = checked
-        #     res.append(video_info)
+                video_info["checked"] = checked
+                video_info["disable"] = checked
+                res.append(video_info)
+        else:
+            for v in all_video_id_list:
+                video_info = get_video_info(v["bvid"])
+                not_exist = not VideoIDMapping.objects.filter(bvid=v["bvid"]).exists()
+                checked = (
+                    is_uploaded(
+                        youtube_client, VideoIDMapping.objects.get(bvid=v["bvid"]).yvid
+                    )
+                    if not not_exist
+                    else False
+                )
+                video_info["checked"] = checked
+                video_info["disable"] = checked
+                res.append(video_info)
         return res
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
@@ -371,40 +360,43 @@ def get_all_series_list_with_video_ids(mid):
     try:
         res = []
         series_lists = get_series_lists(mid)
-        ser_list_futures = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        if ENABLE_MULTI_THREAD:
+            ser_list_futures = []
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for ser_list in series_lists:
+                    future = executor.submit(
+                        get_series_list_videos, mid, ser_list["series_id"]
+                    )
+                    ser_list_futures.append(future)
+            i = 0
+            for ser_list_future in ser_list_futures:
+                series_videos = ser_list_future.result()
+                video_ids = []
+                for v in series_videos:
+                    video_ids.append(v["bvid"])
+                temp = {
+                    "id": series_lists[i]["series_id"],
+                    "title": series_lists[i]["name"],
+                    "desc": series_lists[i]["description"],
+                    "video_ids": video_ids,
+                }
+                res.append(temp)
+                i += 1
+        else:
             for ser_list in series_lists:
-                future = executor.submit(
-                    get_series_list_videos, mid, ser_list["series_id"]
-                )
-                ser_list_futures.append(future)
-        i = 0
-        for ser_list_future in ser_list_futures:
-            series_videos = ser_list_future.result()
-            video_ids = []
-            for v in series_videos:
-                video_ids.append(v["bvid"])
-            temp = {
-                "id": series_lists[i]["series_id"],
-                "title": series_lists[i]["name"],
-                "desc": series_lists[i]["description"],
-                "video_ids": video_ids,
-            }
-            res.append(temp)
-            i += 1
-        # for ser_list in series_lists:
-        #     series_id = ser_list["series_id"]
-        #     video_ids = []
-        #     series_videos = get_series_list_videos(mid, ser_list["series_id"])
-        #     for v in series_videos:
-        #         video_ids.append(v["bvid"])
+                series_id = ser_list["series_id"]
+                video_ids = []
+                series_videos = get_series_list_videos(mid, ser_list["series_id"])
+                for v in series_videos:
+                    video_ids.append(v["bvid"])
 
-        #     temp = {
-        #         "id": series_id,
-        #         "title": ser_list["name"],
-        #         "video_ids": video_ids,
-        #     }
-        #     res.append(temp)
+                temp = {
+                    "id": series_id,
+                    "title": ser_list["name"],
+                    "desc": ser_list["description"],
+                    "video_ids": video_ids,
+                }
+                res.append(temp)
         return res
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)

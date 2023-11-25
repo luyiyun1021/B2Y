@@ -1,13 +1,18 @@
 import requests
 import math
 import concurrent.futures
+import traceback
+import time
 
 # from ..youtube_utils import *
 from ..youtube_utils import *
 from ..bilibili_utils import uploader as bili_utils_u
 from bili2youtube.models import UserIDMapping, VideoIDMapping
+from bili2youtube.bilibili_utils.header_gen import generate_headers
+from bili2youtube.bilibili_utils.wbi import getSignedParams
 
 SESSION_ID = ""
+ENABLE_MULTI_THREAD = True
 
 
 def get_followings_list(mid, page_size=10, session_id=SESSION_ID, youtube_client=None):
@@ -17,11 +22,19 @@ def get_followings_list(mid, page_size=10, session_id=SESSION_ID, youtube_client
         "ps": page_size,
         "pn": 1,
     }
+    signed_params = getSignedParams(base_params)
     cookies = {"SESSDATA": session_id}
 
     try:
-        response = requests.get(url, params=base_params, cookies=cookies)
+        headers = generate_headers(f"SESSDATA={session_id}")
+        response = requests.get(
+            url,
+            params=signed_params,
+            cookies=cookies,
+            headers=headers,
+        )
         json_response = response.json()
+        response.raise_for_status()
         res = []
         total_followings = json_response["data"]["total"]
         total_pages = math.ceil(total_followings / page_size)
@@ -41,7 +54,12 @@ def get_followings_list(mid, page_size=10, session_id=SESSION_ID, youtube_client
                 "ps": page_size,
                 "pn": page,
             }
-            response = requests.get(url, params=params, cookies=cookies)
+            signed_params = getSignedParams(params)
+            headers = generate_headers(f"SESSDATA={session_id}")
+            response = requests.get(
+                url, params=signed_params, cookies=cookies, headers=headers
+            )
+            response.raise_for_status()
             json_response = response.json()
             following_list = json_response["data"]["list"]
             for item in following_list:
@@ -62,6 +80,7 @@ def get_followings_list(mid, page_size=10, session_id=SESSION_ID, youtube_client
         return res
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
+        traceback.print_stack()
 
 
 def get_collection_folders(mid):
@@ -70,7 +89,7 @@ def get_collection_folders(mid):
         "up_mid": mid,
     }
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, headers=generate_headers())
         res = []
         json_response = response.json()
         folder_list = json_response["data"]["list"]
@@ -137,7 +156,11 @@ def get_collection_videos_from_a_folder(folder_id, page_size=2, session_id=SESSI
                 "pn": page_num,
                 "platform": "web",
             }
-            response = requests.get(url, params=params, cookies=cookies)
+            params = getSignedParams(params)
+            headers = generate_headers(f"SESSDATA={session_id}")
+            response = requests.get(
+                url, params=params, cookies=cookies, headers=headers
+            )
             json_response = response.json()
             video_list = json_response["data"]["medias"]
             for item in video_list:
@@ -158,6 +181,7 @@ def get_collection_videos_from_a_folder(folder_id, page_size=2, session_id=SESSI
         return res
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
+        traceback.print_stack()
 
 
 def create_youtube_playlist_for_viewer(mid, session_id=SESSION_ID):
@@ -219,55 +243,61 @@ def create_youtube_playlist_for_viewer_selective(mid, set, session_id=SESSION_ID
 def get_like_history(mid, youtube_client):
     url = f"https://api.bilibili.com/x/space/like/video?vmid={mid}"
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=generate_headers())
         json_response = response.json()
         res = []
         video_list = json_response["data"]["list"]
-        video_info_futures = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        if ENABLE_MULTI_THREAD:
+            video_info_futures = []
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for item in video_list:
+                    video_info_futures.append(
+                        executor.submit(bili_utils_u.get_video_info, item["bvid"])
+                    )
+            for video_info_future in video_info_futures:
+                video_info = video_info_future.result()
+                not_exist = not VideoIDMapping.objects.filter(
+                    bvid=video_info["bvid"]
+                ).exists()
+                checked = (
+                    is_rated(
+                        youtube_client,
+                        VideoIDMapping.objects.get(bvid=video_info["bvid"]).yvid,
+                    )
+                    if not not_exist
+                    else False
+                )
+                video_info["checked"] = checked
+                video_info["disable"] = checked or not_exist
+                res.append(video_info)
+        else:
             for item in video_list:
-                video_info_futures.append(
-                    executor.submit(bili_utils_u.get_video_info, item["bvid"])
+                # video = {'bvid':item['bvid'],
+                #          'title': item['title'],
+                #          'owner': {
+                #             'mid': item['owner']['mid'],
+                #             'name': item['owner']['name'],
+                #          }}
+                # res.append(video)
+                video_info = bili_utils_u.get_video_info(item["bvid"])
+                not_exist = not VideoIDMapping.objects.filter(
+                    bvid=item["bvid"]
+                ).exists()
+                checked = (
+                    is_rated(
+                        youtube_client,
+                        VideoIDMapping.objects.get(bvid=item["bvid"]).yvid,
+                    )
+                    if not not_exist
+                    else False
                 )
-        for video_info_future in video_info_futures:
-            video_info = video_info_future.result()
-            not_exist = not VideoIDMapping.objects.filter(
-                bvid=video_info["bvid"]
-            ).exists()
-            checked = (
-                is_rated(
-                    youtube_client,
-                    VideoIDMapping.objects.get(bvid=video_info["bvid"]).yvid,
-                )
-                if not not_exist
-                else False
-            )
-            video_info["checked"] = checked
-            video_info["disable"] = checked or not_exist
-            res.append(video_info)
-        # for item in video_list:
-        #     # video = {'bvid':item['bvid'],
-        #     #          'title': item['title'],
-        #     #          'owner': {
-        #     #             'mid': item['owner']['mid'],
-        #     #             'name': item['owner']['name'],
-        #     #          }}
-        #     # res.append(video)
-        #     video_info = bili_utils_u.get_video_info(item["bvid"])
-        #     not_exist = not VideoIDMapping.objects.filter(bvid=item["bvid"]).exists()
-        #     checked = (
-        #         is_rated(
-        #             youtube_client, VideoIDMapping.objects.get(bvid=item["bvid"]).yvid
-        #         )
-        #         if not not_exist
-        #         else False
-        #     )
-        #     video_info["checked"] = checked
-        #     video_info["disable"] = checked or not_exist
-        #     res.append(video_info)
+                video_info["checked"] = checked
+                video_info["disable"] = checked or not_exist
+                res.append(video_info)
         return res
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
+        traceback.print_stack()
 
 
 def get_collections_with_video_ids_and_all_videos_info(
@@ -278,70 +308,70 @@ def get_collections_with_video_ids_and_all_videos_info(
         video_id_set = set()
         all_videos_info = []
         folder_list = get_collection_folders(mid)
-        # for folder in folder_list:
-        #     folder_id = folder["id"]
-        #     collection_videos = get_collection_videos_from_a_folder(
-        #         folder_id, session_id=session_id
-        #     )
-        #     videos = []
-        #     for video in collection_videos:
-        #         videos.append(video["bvid"])
-        #         video_id_set.add(video["bvid"])
-        #     playlist = {
-        #         "id": folder["id"],
-        #         "title": folder["title"],
-        #         "video_ids": videos,
-        #     }
-        #     collection_with_video_ids.append(playlist)
-        # for vid in video_id_set:
-        #     video_info = bili_utils_u.get_video_info(vid)
-        #     not_exist = not VideoIDMapping.objects.filter(bvid=vid).exists()
-        #     video_info["disable"] = not_exist
-        #     all_videos_info.append(video_info)
+        if ENABLE_MULTI_THREAD:
+            collection_videos_futures = []
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for folder in folder_list:
+                    folder_id = folder["id"]
+                    collection_videos_futures.append(
+                        executor.submit(
+                            get_collection_videos_from_a_folder,
+                            folder_id,
+                            session_id=session_id,
+                        )
+                    )
+            i = 0
+            for collection_videos_future in collection_videos_futures:
+                collection_videos = collection_videos_future.result()
+                videos = []
+                for video in collection_videos:
+                    videos.append(video["bvid"])
+                    video_id_set.add(video["bvid"])
+                playlist = {
+                    "id": folder_list[i]["id"],
+                    "title": folder_list[i]["title"],
+                    "desc": get_collection_folder_intro_description(
+                        folder_list[i]["id"], session_id=session_id
+                    ),
+                    "video_ids": videos,
+                }
+                collection_with_video_ids.append(playlist)
+                i += 1
 
-        collection_videos_futures = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+            video_info_futures = []
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                for vid in video_id_set:
+                    video_info_futures.append(
+                        executor.submit(bili_utils_u.get_video_info, vid)
+                    )
+            for video_info_future in video_info_futures:
+                video_info = video_info_future.result()
+                not_exist = not VideoIDMapping.objects.filter(
+                    bvid=video_info["bvid"]
+                ).exists()
+                video_info["disable"] = not_exist
+                all_videos_info.append(video_info)
+        else:
             for folder in folder_list:
                 folder_id = folder["id"]
-                collection_videos_futures.append(
-                    executor.submit(
-                        get_collection_videos_from_a_folder,
-                        folder_id,
-                        session_id=session_id,
-                    )
+                collection_videos = get_collection_videos_from_a_folder(
+                    folder_id, session_id=session_id
                 )
-        i = 0
-        for collection_videos_future in collection_videos_futures:
-            collection_videos = collection_videos_future.result()
-            videos = []
-            for video in collection_videos:
-                videos.append(video["bvid"])
-                video_id_set.add(video["bvid"])
-            playlist = {
-                "id": folder_list[i]["id"],
-                "title": folder_list[i]["title"],
-                "desc": get_collection_folder_intro_description(
-                    folder_list[i]["id"], session_id=session_id
-                ),
-                "video_ids": videos,
-            }
-            collection_with_video_ids.append(playlist)
-            i += 1
-
-        video_info_futures = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+                videos = []
+                for video in collection_videos:
+                    videos.append(video["bvid"])
+                    video_id_set.add(video["bvid"])
+                playlist = {
+                    "id": folder["id"],
+                    "title": folder["title"],
+                    "video_ids": videos,
+                }
+                collection_with_video_ids.append(playlist)
             for vid in video_id_set:
-                video_info_futures.append(
-                    executor.submit(bili_utils_u.get_video_info, vid)
-                )
-        for video_info_future in video_info_futures:
-            video_info = video_info_future.result()
-            not_exist = not VideoIDMapping.objects.filter(
-                bvid=video_info["bvid"]
-            ).exists()
-            video_info["disable"] = not_exist
-            all_videos_info.append(video_info)
-
+                video_info = bili_utils_u.get_video_info(vid)
+                not_exist = not VideoIDMapping.objects.filter(bvid=vid).exists()
+                video_info["disable"] = not_exist
+                all_videos_info.append(video_info)
         return all_videos_info, collection_with_video_ids
     except Exception as error:
         print("An exception occurred:", type(error).__name__, "–", error)
