@@ -179,7 +179,7 @@ export function Login() {
       {Bsignined && Ysignined ? (
         <h3>Choose the role and begin Transfer!</h3>
       ) : (
-        <h3>Please login both account first</h3>
+        <h3>Please login both accounts first</h3>
       )}
       <Button
         disabled={Bsignined && Ysignined ? false : true}
