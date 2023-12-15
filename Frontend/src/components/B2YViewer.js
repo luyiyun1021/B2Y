@@ -169,7 +169,7 @@ export function B2YViewer() {
       .then(async (res) => await res.json())
       .then((data) => {
         if (data.status === "success") {
-          alert("Migration Successed!");
+          alert("Migration Succeeded!");
         } else {
           alert("Migration Failed!");
         }
