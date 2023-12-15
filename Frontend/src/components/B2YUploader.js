@@ -113,7 +113,7 @@ export function B2YUploader() {
       .then(async (res) => await res.json())
       .then((data) => {
         if (data.status === "success") {
-          alert("Migration Successed!");
+          alert("Migration Succeeded!");
         } else {
           alert("Migration Failed!");
         }
