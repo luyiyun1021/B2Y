@@ -388,7 +388,7 @@ export function B2YViewer() {
             items={[
               {
                 key: 0,
-                label: "Follows",
+                label: "Followings",
                 children: (
                   <List
                     className="demo-loadmore-list"
