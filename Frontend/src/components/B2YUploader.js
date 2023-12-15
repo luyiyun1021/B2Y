@@ -279,7 +279,7 @@ export function B2YUploader() {
             items={[
               {
                 key: 0,
-                label: "Sets",
+                label: "Playlists",
                 children: data.sets.map((e, i) => (
                   <Collapse
                     // defaultActiveKey={["0"]}
