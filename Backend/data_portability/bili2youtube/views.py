@@ -18,7 +18,7 @@ ENABLE_MULTI_THREAD = True
 def migrate_uploader(request: HttpRequest) -> HttpResponse:
     try:
         b_session_data = request.GET.get("SESSDATA")
-        b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
+        #b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
         body_unicode = request.body.decode("utf-8")
         body = json.loads(body_unicode)
         videos_ids = body.get("videos")
@@ -77,7 +77,7 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
                     description=set["desc"],
                     tags=[],
                     defaultLanguage="en",
-                    privacyStatus="private",
+                    privacyStatus="public",
                     platform=youtube_utils.Platform.BILIBILI,
                     videoList=set["videos"],
                 )
@@ -122,7 +122,7 @@ def migrate_uploader(request: HttpRequest) -> HttpResponse:
 
 def migrate_viewer(request: HttpRequest) -> HttpResponse:
     b_session_data = request.GET.get("SESSDATA")
-    b_session_data = "bcca7760%2C1716426302%2Cea89d%2Ab2CjCf2p5xczW0uIzyrgTzZelAWSYJDMekdpSTTPPdfikRMecWNhfl3-YpgAqb72TJgP4SVmpHVm1iS2FaNXRKVDFicmJMU2hpSGtPeGZVRVl1eEJoUHpJVEZfRHdXV0xwWmZBQ1hnTFJVQ3lPbnNhZjhZdmVRM0RjWF9PWE1peHlxMVZsbWZEdG9RIIEC"
+    #b_session_data = "bcca7760%2C1716426302%2Cea89d%2Ab2CjCf2p5xczW0uIzyrgTzZelAWSYJDMekdpSTTPPdfikRMecWNhfl3-YpgAqb72TJgP4SVmpHVm1iS2FaNXRKVDFicmJMU2hpSGtPeGZVRVl1eEJoUHpJVEZfRHdXV0xwWmZBQ1hnTFJVQ3lPbnNhZjhZdmVRM0RjWF9PWE1peHlxMVZsbWZEdG9RIIEC"
     youtube_access_token = request.GET.get("access_token")
     body_unicode = request.body.decode("utf-8")
     body = json.loads(body_unicode)
@@ -228,7 +228,7 @@ def B2Y_get_uploader_info(request: HttpRequest) -> HttpResponse:
         youtube_client = Client(access_token=y_access_token)
 
         b_session_data = request.GET.get("SESSDATA")
-        b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
+        #b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
         user = bili_utils_u.get_user_info(b_session_data)
         mid = user["mid"]
         if ENABLE_MULTI_THREAD:
@@ -273,7 +273,7 @@ def B2Y_get_viewer_info(request: HttpRequest) -> HttpResponse:
         y_access_token = request.GET.get("access_token")
         youtube_client = Client(access_token=y_access_token)
         b_session_data = request.GET.get("SESSDATA")
-        b_session_data = "bcca7760%2C1716426302%2Cea89d%2Ab2CjCf2p5xczW0uIzyrgTzZelAWSYJDMekdpSTTPPdfikRMecWNhfl3-YpgAqb72TJgP4SVmpHVm1iS2FaNXRKVDFicmJMU2hpSGtPeGZVRVl1eEJoUHpJVEZfRHdXV0xwWmZBQ1hnTFJVQ3lPbnNhZjhZdmVRM0RjWF9PWE1peHlxMVZsbWZEdG9RIIEC"
+        #b_session_data = "bcca7760%2C1716426302%2Cea89d%2Ab2CjCf2p5xczW0uIzyrgTzZelAWSYJDMekdpSTTPPdfikRMecWNhfl3-YpgAqb72TJgP4SVmpHVm1iS2FaNXRKVDFicmJMU2hpSGtPeGZVRVl1eEJoUHpJVEZfRHdXV0xwWmZBQ1hnTFJVQ3lPbnNhZjhZdmVRM0RjWF9PWE1peHlxMVZsbWZEdG9RIIEC"
         user = bili_utils_u.get_user_info(b_session_data)
         mid = user["mid"]
         if ENABLE_MULTI_THREAD:
@@ -332,7 +332,7 @@ def B2Y_get_viewer_info(request: HttpRequest) -> HttpResponse:
 def migrate_uploader_all(request: HttpRequest) -> HttpResponse:
     try:
         b_session_data = request.GET.get("SESSDATA")
-        b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
+        #b_session_data = "cda35e2e%2C1713064715%2Cc8245%2Aa1CjAKIiBK7h1tvo8DlV7C4IGmQVcDIFk_rvrkUqo3YvlwD6jiR3gUEKUn8FyFRdrUf7USVmd0Z3FBTFhLeFVwQmpISkg5emdJX2l5YkNsVW93cGhkMk9tSHhCZ3htR0RVbDFzR3ZUdW9fSE5YdjJmQl9La29VaWFMWlFMMkxLUDFjU2N3NVdTbU5nIIEC"
         user = bili_utils_u.get_user_info(b_session_data)
         # Get Bilibili UID
         buid = user["mid"]
